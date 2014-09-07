@@ -1,0 +1,4 @@
+; My computer does not see that extensions
+
+extension=json.so
+extension=gd.so
