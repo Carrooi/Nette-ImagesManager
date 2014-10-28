@@ -118,10 +118,9 @@ class Helpers extends Object
 	 * @param string $extension
 	 * @param string $size
 	 * @param string $resizeFlag
-	 * @param bool $thumbnailData
 	 * @return string
 	 */
-	public static function expand($s, $namespace, $name, $extension, $size = null, $resizeFlag = null, $thumbnailData = true)
+	public static function expand($s, $namespace, $name, $extension, $size = null, $resizeFlag = null)
 	{
 		$s = strtr($s, array(
 			'<separator>' => DIRECTORY_SEPARATOR,
@@ -130,7 +129,7 @@ class Helpers extends Object
 			'<extension>' => $extension,
 		));
 
-		if ($thumbnailData) {
+		if ($size !== null && $resizeFlag !== null) {
 			$s = strtr($s, array(
 				'<size>' => $size,
 				'<resizeFlag>' => $resizeFlag,
@@ -149,7 +148,12 @@ class Helpers extends Object
 	 */
 	public static function expandFromImage($s, Image $image, $thumbnailData = true)
 	{
-		return self::expand($s, $image->getNamespace(), $image->getName(false), $image->getExtension(), $image->getSize(), $image->getResizeFlag(), $thumbnailData);
+		if ($thumbnailData) {
+			return self::expand($s, $image->getNamespace(), $image->getName(false), $image->getExtension(), $image->getSize(), $image->getResizeFlag());
+		} else {
+			return self::expand($s, $image->getNamespace(), $image->getName(false), $image->getExtension());
+		}
+
 	}
 
 

@@ -146,6 +146,12 @@ This step also couldn't be easier, because there are some Latte macros registere
 <img n:src="users, 'david.jpg', 150, stretch">
 ```
 
+You can even use names without files' extensions and images-manager will try to find it for you:
+
+```
+<img n:src="users, david, 100">
+```
+
 ### Name resolvers
 
 With default setup, you have to use string names like `david.jpg`. But for users it would be better to use eg. their 

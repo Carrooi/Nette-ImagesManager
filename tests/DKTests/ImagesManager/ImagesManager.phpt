@@ -62,6 +62,25 @@ class ImagesManagerTest extends TestCase
 	}
 
 
+	public function testLoad_withoutExtension()
+	{
+		$manager = $this->getManager();
+		$image = $manager->load('dots', 'black');
+
+		Assert::contains($image->getName(), array('black.jpg', 'black.png'));
+	}
+
+
+	public function testLoad_withoutExtension_notExists()
+	{
+		$manager = $this->getManager();
+
+		Assert::exception(function() use ($manager) {
+			$manager->load('dots', 'red');
+		}, 'DK\ImagesManager\InvalidArgumentException', 'Name must in "<name>.<extension>" format, "red" given.');
+	}
+
+
 	public function testLoad_customNameResolver()
 	{
 		$manager = $this->getManager();

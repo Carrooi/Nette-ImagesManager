@@ -279,6 +279,12 @@ class ImagesManager extends Object
 			$name = $this->getNamespace($namespace)->getNameResolver()->translateName($name);
 		}
 
+		if (pathinfo($name, PATHINFO_EXTENSION) === '') {
+			if (($extension = $this->tryFindExtension($namespace, $name)) !== null) {
+				$name .= ".$extension";
+			}
+		}
+
 		$image = new Image($namespace, $name, $this->httpRequest);
 
 		$image
@@ -288,6 +294,25 @@ class ImagesManager extends Object
 			->setThumbnailsMask($this->getThumbnailsMask());
 
 		return $image;
+	}
+
+
+	/**
+	 * @param string $namespace
+	 * @param string $name
+	 * @return string
+	 */
+	private function tryFindExtension($namespace, $name)
+	{
+		$path = Helpers::expand($this->getBasePath(). DIRECTORY_SEPARATOR. $this->getImagesMask(), $namespace, $name, '*');
+		$shortName = pathinfo($path, PATHINFO_BASENAME);
+		$dir = pathinfo($path, PATHINFO_DIRNAME);
+
+		foreach (Finder::findFiles($shortName)->in($dir) as $image => $file) {		/** @var $file \SplFileInfo */
+			return $file->getExtension();
+		}
+
+		return null;
 	}
 
 
