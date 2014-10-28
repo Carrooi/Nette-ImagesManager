@@ -55,8 +55,34 @@ class Extension extends CompilerExtension
 				$config['quality'],
 			));
 
-		foreach ($config['namespaces'] as $namespace => $definition) {
-			$manager->addSetup('setNamespaceDefinition', array($namespace, $this->parseNamespaceDefinition($config, $namespace, $definition)));
+		foreach ($config['namespaces'] as $name => $definition) {
+			if (!isset($definition['default'])) {
+				$definition['default'] = $config['default'];
+			}
+
+			if (is_string($definition['default']) && ($match = Strings::match($definition['default'], '/^<list\|([a-zA-Z0-9]+)>$/'))) {
+				$listName = $match[1];
+				if (!isset($definition['lists'][$listName])) {
+					throw new InvalidStateException('List "'. $listName. '" is not registered in "'. $name. '" namespace.');
+				}
+
+				$definition['default'] = $definition['lists'][$listName];
+			}
+
+			$namespace = $builder->addDefinition($this->prefix("namespace.$name"))
+				->setClass('DK\ImagesManager\NamespaceManager', array($name))
+				->setAutowired(false)
+				->addSetup('setDefault', array($definition['default']))
+				->addSetup('setResizeFlag', array(isset($definition['resizeFlag']) ? $definition['resizeFlag'] : $config['resizeFlag']))
+				->addSetup('setQuality', array(isset($definition['quality']) ? $definition['quality'] : $config['quality']));
+
+			if (isset($definition['lists'])) {
+				foreach ($definition['lists'] as $listName => $images){
+					$namespace->addSetup('addList', array($listName, $images));
+				}
+			}
+
+			$manager->addSetup('addNamespace', array($name, $this->prefix("@namespace.$name")));
 		}
 
 		$builder->addDefinition($this->prefix('helpers'))
@@ -71,51 +97,6 @@ class Extension extends CompilerExtension
 		$latteFactory
 			->addSetup('DK\ImagesManager\Latte\Macros::install(?->getCompiler())', array('@self'))
 			->addSetup('addFilter', array('getImagesManager', array($this->prefix('@helpers'), 'getImagesManager')));
-	}
-
-
-	/**
-	 * @param array $config
-	 * @param string $namespace
-	 * @param array $definition
-	 * @return array
-	 * @throws \DK\ImagesManager\InvalidStateException
-	 */
-	private function parseNamespaceDefinition(array $config, $namespace, array $definition)
-	{
-		if (!array_key_exists('lists', $definition)) {
-			$definition['lists'] = array();
-		}
-
-		$definition['lists'] = array_map(function($images) {
-			return array(
-				'images' => $images,
-				'parsed' => null,
-			);
-		}, $definition['lists']);
-
-		if (!array_key_exists('resizeFlag', $definition)) {
-			$definition['resizeFlag'] = $config['resizeFlag'];
-		}
-
-		if (!array_key_exists('default', $definition)) {
-			$definition['default'] = $config['default'];
-		}
-
-		if (is_string($definition['default']) && ($match = Strings::match($definition['default'], '/^<list\|([a-zA-Z0-9]+)>$/'))) {
-			$default = $match[1];
-			if (!isset($definition['lists'][$default])) {
-				throw new InvalidStateException('List "'. $default. '" is not registered in "'. $namespace. '" namespace.');
-			}
-
-			$definition['default'] = $definition['lists'][$default]['images'];
-		}
-
-		if (!array_key_exists('quality', $definition)) {
-			$definition['quality'] = $config['quality'];
-		}
-
-		return $definition;
 	}
 
 

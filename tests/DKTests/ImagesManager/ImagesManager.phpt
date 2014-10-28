@@ -23,74 +23,6 @@ class ImagesManagerTest extends TestCase
 {
 
 
-	public function testGetResizeFlag()
-	{
-		$manager = $this->getManager();
-
-		Assert::same('fit', $manager->getResizeFlag('dots'));
-	}
-
-
-	public function testGetResizeFlag_custom()
-	{
-		$manager = $this->getManager();
-
-		Assert::same('stretch', $manager->getResizeFlag('colors'));
-	}
-
-
-	public function testGetDefault()
-	{
-		$manager = $this->getManager();
-
-		Assert::same('default.jpg', $manager->getDefault('dots'));
-	}
-
-
-	public function testGetDefault_custom()
-	{
-		$manager = $this->getManager();
-
-		Assert::same('white.png', $manager->getDefault('colors'));
-	}
-
-
-	public function testGetDefault_random()
-	{
-		$manager = $this->getManager();
-
-		Assert::contains($manager->getDefault('lines'), array(
-			'white.png', 'black.png'
-		));
-	}
-
-
-	public function testGetDefault_list()
-	{
-		$manager = $this->getManager();
-
-		Assert::contains($manager->getDefault('squares'), array(
-			'white.png', 'black.png'
-		));
-	}
-
-
-	public function testGetQuality()
-	{
-		$manager = $this->getManager();
-
-		Assert::null($manager->getQuality('dots'));
-	}
-
-
-	public function testGetQuality_custom()
-	{
-		$manager = $this->getManager();
-
-		Assert::same(100, $manager->getQuality('colors'));
-	}
-
-
 	public function testLoad()
 	{
 		$manager = $this->getManager();
@@ -135,44 +67,6 @@ class ImagesManagerTest extends TestCase
 		Assert::exception(function() use ($manager) {
 			$manager->load('dots', 'pink.jpg', null, null, false);
 		}, 'DK\ImagesManager\ImageNotExistsException', 'Image "pink.jpg" does not exists.');
-	}
-
-
-	public function testGetList()
-	{
-		$manager = $this->getManager();
-		$list = $manager->getList('colors', 'best');
-
-		$images = array_map(function(Image $image) {
-			return $image->getNamespace(). '/' .$image->getName();
-		}, $list);
-
-		$manager->getList('colors', 'best');
-
-		Assert::equal(array(
-			'colors/black.jpg',
-			'colors/pink.png',
-		), $images);
-	}
-
-
-	public function testGetList_namespace_not_exists()
-	{
-		$manager = $this->getManager();
-
-		Assert::exception(function() use ($manager) {
-			$manager->getList('someNamespace', 'best');
-		}, 'DK\ImagesManager\InvalidArgumentException', 'Images namespace "someNamespace" is not registered.');
-	}
-
-
-	public function testGetList_not_exists()
-	{
-		$manager = $this->getManager();
-
-		Assert::exception(function() use ($manager) {
-			$manager->getList('colors', 'unknown');
-		}, 'DK\ImagesManager\InvalidArgumentException', 'Images list "unknown" is not registered in "colors" namespace.');
 	}
 
 

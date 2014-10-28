@@ -41,7 +41,7 @@ class ImagesManager extends Object
 	/** @var int */
 	private $quality;
 
-	/** @var array */
+	/** @var \DK\ImagesManager\NamespaceManager[] */
 	private $namespaces = array();
 
 
@@ -105,125 +105,41 @@ class ImagesManager extends Object
 
 
 	/**
-	 * @internal
-	 * @param string $namespace
-	 * @param array $definition
-	 */
-	public function setNamespaceDefinition($namespace, array $definition)
-	{
-		$this->namespaces[$namespace] = $definition;
-	}
-
-
-	/**
-	 * @param string $namespace
-	 * @return bool
-	 */
-	private function isNamespaceDefinition($namespace)
-	{
-		return isset($this->namespaces[$namespace]);
-	}
-
-
-	/**
-	 * @param string $namespace
-	 * @return array
-	 * @throws \DK\ImagesManager\InvalidArgumentException
-	 */
-	private function &getNamespaceDefinition($namespace)
-	{
-		if (!$this->isNamespaceDefinition($namespace)) {
-			throw new InvalidArgumentException('Images namespace "'. $namespace. '" is not registered.');
-		}
-
-		$namespace = &$this->namespaces[$namespace];
-
-		return $namespace;
-	}
-
-
-	/**
-	 * @param string $namespace
 	 * @param string $name
-	 * @return \DK\ImagesManager\Image[]
-	 * @throws \DK\ImagesManager\InvalidArgumentException
+	 * @param \DK\ImagesManager\NamespaceManager $namespaceManager
+	 * @return \DK\ImagesManager\ImagesManager
 	 */
-	public function getList($namespace, $name)
+	public function addNamespace($name, NamespaceManager $namespaceManager)
 	{
-		$_namespace = &$this->getNamespaceDefinition($namespace);
-
-		if (!isset($_namespace['lists'][$name])) {
-			throw new InvalidArgumentException('Images list "'. $name. '" is not registered in "'. $namespace. '" namespace.');
-		}
-
-		if ($_namespace['lists'][$name]['parsed'] === null) {
-			$_namespace['lists'][$name]['parsed'] = array();
-
-			foreach ($_namespace['lists'][$name]['images'] as $image) {
-				$_namespace['lists'][$name]['parsed'][] = $this->createImage($namespace, $image);
-			}
-		}
-
-		return $_namespace['lists'][$name]['parsed'];
+		$this->namespaces[$name] = $namespaceManager;
+		$namespaceManager->registerImagesManager($this);
+		return $this;
 	}
 
 
 	/**
-	 * @param string $namespace
-	 * @return string
+	 * @param string $name
+	 * @return \DK\ImagesManager\NamespaceManager
 	 */
-	public function getResizeFlag($namespace)
+	public function getNamespace($name)
 	{
-		if ($this->isNamespaceDefinition($namespace)) {
-			$namespace = $this->getNamespaceDefinition($namespace);
-			return $namespace['resizeFlag'];
+		if (!isset($this->namespaces[$name])) {
+			$manager = new NamespaceManager($name);
+			$manager
+				->setDefault($this->default)
+				->setResizeFlag($this->resizeFlag)
+				->setQuality($this->quality);
+
+			$this->addNamespace($name, $manager);
 		}
 
-		return $this->resizeFlag;
-	}
-
-
-	/**
-	 * @param string $namespace
-	 * @return string
-	 */
-	public function getDefault($namespace)
-	{
-		$default = $this->default;
-
-		if ($this->isNamespaceDefinition($namespace)) {
-			$namespace = $this->getNamespaceDefinition($namespace);
-			$default = $namespace['default'];
-		}
-
-		if (is_array($default)) {
-			$default = $default[array_rand($default)];
-		}
-
-		return $default;
-	}
-
-
-	/**
-	 * @param string $namespace
-	 * @return string
-	 */
-	public function getQuality($namespace)
-	{
-		if ($this->isNamespaceDefinition($namespace)) {
-			$namespace = $this->getNamespaceDefinition($namespace);
-			return $namespace['quality'];
-		}
-
-		return $this->quality;
+		return $this->namespaces[$name];
 	}
 
 
 	/**
 	 * @param string $namespace
 	 * @return \DK\ImagesManager\Image[]
-	 *
-	 * @todo: refactor
 	 */
 	public function findImages($namespace)
 	{
@@ -305,16 +221,18 @@ class ImagesManager extends Object
 	 */
 	public function load($namespace, $name, $size = null, $resizeFlag = null, $default = null, $quality = null)
 	{
+		$namespaceManager = $this->getNamespace($namespace);
+
 		if ($resizeFlag === null) {
-			$resizeFlag = $this->getResizeFlag($namespace);
+			$resizeFlag = $namespaceManager->getResizeFlag();
 		}
 
 		if ($default === null) {
-			$default = $this->getDefault($namespace);
+			$default = $namespaceManager->getDefault();
 		}
 
 		if ($quality === null) {
-			$quality = $this->getQuality($namespace);
+			$quality = $namespaceManager->getQuality();
 		}
 
 		if ($name === null) {
