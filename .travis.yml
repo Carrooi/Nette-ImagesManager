@@ -15,4 +15,4 @@ before_script:
   - composer self-update
   - composer install --no-interaction --prefer-source --dev
 
-script: VERBOSE=true /bin/bash ./tests/run-tests.sh
+script: ./vendor/bin/tester -c ./tests/php.ini-unix ./tests/DKTests/
