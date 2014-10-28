@@ -296,7 +296,7 @@ class ImagesManager extends Object
 		}
 
 		if ($quality === null) {
-			$quality = $this->quality;
+			$quality = $this->getNamespace($namespace)->getQuality();
 		}
 
 		$image->save($img->getPath(), $quality);
