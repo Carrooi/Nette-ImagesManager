@@ -438,5 +438,13 @@ All methods which returns images, returns `DK\ImagesManager\Image` class.
 
 # Changelog
 
+* 1.1.0
+	+ Some optimizations
+	* Upload method now uses quality from namespace configuration
+	* Added name resolvers
+	* Images can be loaded without their files' extensions
+	* Added caching (now using just in searching for files' extensions)
+	* Little bit better readme
+
 * 1.0.0
 	+ Initial version
