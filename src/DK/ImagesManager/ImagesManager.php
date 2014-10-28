@@ -2,6 +2,8 @@
 
 namespace DK\ImagesManager;
 
+use Nette\Caching\Cache;
+use Nette\Caching\IStorage;
 use Nette\Object;
 use Nette\Utils\Image as NetteImage;
 use Nette\Utils\Strings;
@@ -17,11 +19,20 @@ class ImagesManager extends Object
 {
 
 
+	const CACHE_NAMESPACE = 'DK.ImagesManager';
+
+
 	/** @var \Nette\Http\Request */
 	private $httpRequest;
 
 	/** @var \DK\ImagesManager\INameResolver */
 	private $nameResolver;
+
+	/** @var \Nette\Caching\Cache */
+	private $cache;
+
+	/** @var bool */
+	private $caching;
 
 	/** @var string */
 	private $basePath;
@@ -50,6 +61,7 @@ class ImagesManager extends Object
 
 	/**
 	 * @param \DK\ImagesManager\INameResolver $nameResolver
+	 * @param \Nette\Caching\IStorage $cacheStorage
 	 * @param string $basePath
 	 * @param string $baseUrl
 	 * @param string $imagesMask
@@ -59,7 +71,7 @@ class ImagesManager extends Object
 	 * @param int $quality
 	 * @param \Nette\Http\Request $httpRequest
 	 */
-	public function __construct(INameResolver $nameResolver, $basePath, $baseUrl, $imagesMask, $thumbnailsMask, $resizeFlag, $default, $quality, Request $httpRequest)
+	public function __construct(INameResolver $nameResolver, IStorage $cacheStorage, $basePath, $baseUrl, $imagesMask, $thumbnailsMask, $resizeFlag, $default, $quality, Request $httpRequest)
 	{
 		$this->nameResolver = $nameResolver;
 		$this->httpRequest = $httpRequest;
@@ -70,6 +82,28 @@ class ImagesManager extends Object
 		$this->resizeFlag = $resizeFlag;
 		$this->default = $default;
 		$this->quality = $quality;
+
+		$this->cache = new Cache($cacheStorage, self::CACHE_NAMESPACE);
+	}
+
+
+	/**
+	 * @return bool
+	 */
+	public function isCaching()
+	{
+		return $this->caching === true;
+	}
+
+
+	/**
+	 * @param bool $caching
+	 * @return \DK\ImagesManager\ImagesManager
+	 */
+	public function setCaching($caching = true)
+	{
+		$this->caching = $caching;
+		return $this;
 	}
 
 
@@ -304,15 +338,38 @@ class ImagesManager extends Object
 	 */
 	private function tryFindExtension($namespace, $name)
 	{
-		$path = Helpers::expand($this->getBasePath(). DIRECTORY_SEPARATOR. $this->getImagesMask(), $namespace, $name, '*');
-		$shortName = pathinfo($path, PATHINFO_BASENAME);
-		$dir = pathinfo($path, PATHINFO_DIRNAME);
+		$that = $this;
+		$find = function() use ($that, $namespace, $name) {
+			$path = Helpers::expand($that->getBasePath(). DIRECTORY_SEPARATOR. $that->getImagesMask(), $namespace, $name, '*');
+			$shortName = pathinfo($path, PATHINFO_BASENAME);
+			$dir = pathinfo($path, PATHINFO_DIRNAME);
 
-		foreach (Finder::findFiles($shortName)->in($dir) as $image => $file) {		/** @var $file \SplFileInfo */
-			return $file->getExtension();
+			foreach (Finder::findFiles($shortName)->in($dir) as $image => $file) {		/** @var $file \SplFileInfo */
+				return $file->getExtension();
+			}
+
+			return null;
+		};
+
+		if ($this->isCaching()) {
+			$key = "extension/$namespace/$name";
+			$extension = $this->cache->load($key);
+
+			if ($extension === null) {
+				$extension = $find();
+				if ($extension === null) {
+					return null;
+				}
+
+				$this->cache->save($key, $extension, array(
+					Cache::TAGS => array("$namespace/$name"),
+				));
+			}
+
+			return $extension;
 		}
 
-		return null;
+		return $find();
 	}
 
 
@@ -350,6 +407,12 @@ class ImagesManager extends Object
 		}
 
 		unlink($image->getPath());
+
+		if ($this->isCaching()) {
+			$this->cache->clean(array(
+				Cache::TAGS => array("{$image->getNamespace()}/{$image->getName()}"),
+			));
+		}
 	}
 
 

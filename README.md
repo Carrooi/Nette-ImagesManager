@@ -347,11 +347,13 @@ $thumbnails = $imagesManager->findThumbnails($image);
 ```
 images:
 
+	cacheStorage: @cacheStorage
 	resizeFlag: fit
 	default: default.jpg
 	quaility: null
 	basePath: null
 	baseUrl: null
+	caching: true
 	
 	mask:
 		images: <namespace><separator><name>.<extension>

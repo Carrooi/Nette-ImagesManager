@@ -28,11 +28,13 @@ class Extension extends CompilerExtension
 	/** @var array */
 	private $defaults = array(
 		'nameResolver' => 'DK\ImagesManager\DefaultNameResolver',
+		'cacheStorage' => '@cacheStorage',
 		'resizeFlag' => 'fit',
 		'default' => 'default.jpg',
 		'quality' => null,
 		'basePath' => null,
 		'baseUrl' => null,
+		'caching' => true,
 		'mask' => array(
 			'images' => '<namespace><separator><name>.<extension>',
 			'thumbnails' => '<namespace><separator><name>_<resizeFlag>_<size>.<extension>',
@@ -49,6 +51,7 @@ class Extension extends CompilerExtension
 		$manager = $builder->addDefinition($this->prefix('manager'))
 			->setClass('DK\ImagesManager\ImagesManager', array(
 				new Statement($config['nameResolver']),
+				new Statement($config['cacheStorage']),
 				$config['basePath'],
 				$config['baseUrl'],
 				$config['mask']['images'],
@@ -56,7 +59,8 @@ class Extension extends CompilerExtension
 				$config['resizeFlag'],
 				$config['default'],
 				$config['quality'],
-			));
+			))
+			->addSetup('setCaching', array($config['caching']));
 
 		foreach ($config['namespaces'] as $name => $definition) {
 			if (!isset($definition['default'])) {
