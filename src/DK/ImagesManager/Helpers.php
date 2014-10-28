@@ -35,13 +35,12 @@ class Helpers extends Object
 			throw new InvalidArgumentException('Name must be a string, '. gettype($name). ' given.');
 		}
 
-		$pos = mb_strrpos($name, '.');
+		$shortName = pathinfo($name, PATHINFO_FILENAME);
+		$extension = pathinfo($name, PATHINFO_EXTENSION);
 
-		if ($pos === false) {
+		if ($extension === '') {
 			throw new InvalidArgumentException('Name must in "<name>.<extension>" format, "'. $name. '" given.');
 		}
-
-		$shortName = mb_substr($name, 0, $pos);
 
 		if (!Strings::match($shortName, '/^'. Image::NAME_REGEX. '$/')) {
 			throw new InvalidArgumentException('Name must in "<name>.<extension>" format, where <name> must be alphanumerical. "'. $name. '" given.');
@@ -49,7 +48,7 @@ class Helpers extends Object
 
 		return (object) array(
 			'name' => $shortName,
-			'extension' => mb_substr($name, $pos + 1),
+			'extension' => $extension,
 		);
 	}
 
