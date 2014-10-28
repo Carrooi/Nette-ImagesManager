@@ -11,9 +11,9 @@ namespace DKTests\ImagesManager;
 
 require_once __DIR__. '/../bootstrap.php';
 
-use DK\ImagesManager\INameResolver;
-use Nette\Utils\Image as NetteImage;
 use Tester\Assert;
+use Nette\Utils\Image as NetteImage;
+use DK\ImagesManager\INameResolver;
 use DK\ImagesManager\Image;
 
 /**
@@ -172,6 +172,8 @@ class ImagesManagerTest extends TestCase
 
 	public function testUpload()
 	{
+		$this->lock();
+
 		$manager = $this->getManager();
 
 		$imageSource = $manager->createImage('dots', 'newBlack.jpg');
@@ -186,8 +188,11 @@ class ImagesManagerTest extends TestCase
 		unlink($imageSource->getPath());
 	}
 
+
 	public function testUpload_customNameResolver()
 	{
+		$this->lock();
+
 		$manager = $this->getManager();
 		$manager->getNamespace('dots')->setNameResolver(new ArrayNameResolver);
 
@@ -212,6 +217,8 @@ class ImagesManagerTest extends TestCase
 
 	public function testRemoveImage()
 	{
+		$this->lock();
+
 		$manager = $this->getManager();
 		$image = NetteImage::fromFile(__DIR__. '/../www/images/originalBlack.jpg');
 
@@ -227,10 +234,14 @@ class ImagesManagerTest extends TestCase
 
 	public function testRemoveThumbnails()
 	{
+		$this->lock();
+
 		$manager = $this->getManager();
 		$image = NetteImage::fromFile(__DIR__. '/../www/images/originalBlack.jpg');
 
 		$imageSource = $manager->upload($image, 'dots', 'newBlack.jpg');
+
+		Assert::true($imageSource->isExists());
 
 		$thumbnails = array(
 			$manager->load('dots', 'newBlack.jpg', 2),

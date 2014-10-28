@@ -87,6 +87,8 @@ class LatteMacrosTest extends TestCase
 
 	public function testSrcMacro_thumbnail_create()
 	{
+		$this->lock();
+
 		$manager = $this->getManager();
 		$image = $manager->load('dots', 'black.png')->setSize('2x3');
 
