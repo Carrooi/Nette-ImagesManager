@@ -143,7 +143,77 @@ This step also couldn't be easier, because there are some Latte macros registere
 
 *thumbnail with different resize method (default is [fit](http://api.nette.org/2.2.2/source-Utils.Image.php.html#106-107)):*
 ```html
-<img n:src="users", 'david.jpg', 150, stretch">
+<img n:src="users, 'david.jpg', 150, stretch">
+```
+
+### Name resolvers
+
+With default setup, you have to use string names like `david.jpg`. But for users it would be better to use eg. their 
+entities:
+
+```html
+{foreach $users as $userEntity}
+	<img n:src="users, $userEntity, 150">
+{/foreach}
+```
+
+Now you'll be able for example decide if you need to show male or female default photo much more easily. You only have 
+to register custom name resolver.
+
+```php
+namespace App\Images;
+
+use DK\ImagesManager\INameResolver;
+use App\Model\Entities\User;
+use Exception;
+
+class UserEntityNameResolver implements INameResolver
+{
+
+
+	/**
+	 * @param \App\Model\Entities\User $user
+	 * @return string
+	 */
+	public function translateName($user)
+	{
+		if (!$user instanceof User) {
+			throw new Exception;		// todo: better exception
+		}
+		
+		return $user->id. '.'. $user->avatarType;		// translates to eg. 5.png
+	}
+
+
+	/**
+	 * @param \App\Model\Entities\User $user
+	 * @return string
+	 */
+	public function getDefaultName($user)
+	{
+		if (!$user instanceof User) {
+			throw new Exception;		// todo: better exception
+		}
+		
+		return $user->gender->name. '.png';
+	}
+
+}
+```
+
+If you return something from `getDefaultName` method, you'll rewrite defaults from your configuration. You can leave that 
+method empty and default from neon config will be used.
+
+now just register your resolver:
+
+*images.neon:*
+```
+images:
+
+	namespaces:
+	
+		users:
+			nameResolver: App\Images\UserEntityNameResolver
 ```
 
 ### Other Latte macros

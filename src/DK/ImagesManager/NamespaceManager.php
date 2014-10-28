@@ -18,6 +18,9 @@ class NamespaceManager extends Object
 	/** @var \DK\ImagesManager\ImagesManager */
 	private $imagesManager;
 
+	/** @var \DK\ImagesManager\INameResolver */
+	private $nameResolver;
+
 	/** @var string|array */
 	private $default;
 
@@ -33,10 +36,41 @@ class NamespaceManager extends Object
 
 	/**
 	 * @param string $name
+	 * @param \DK\ImagesManager\INameResolver $nameResolver
 	 */
-	public function __construct($name)
+	public function __construct($name, INameResolver $nameResolver)
 	{
 		$this->name = $name;
+		$this->setNameResolver($nameResolver);
+	}
+
+
+	/**
+	 * @return string
+	 */
+	public function getName()
+	{
+		return $this->name;
+	}
+
+
+	/**
+	 * @return \DK\ImagesManager\INameResolver
+	 */
+	public function getNameResolver()
+	{
+		return $this->nameResolver;
+	}
+
+
+	/**
+	 * @param \DK\ImagesManager\INameResolver $nameResolver
+	 * @return \DK\ImagesManager\NamespaceManager
+	 */
+	public function setNameResolver(INameResolver $nameResolver)
+	{
+		$this->nameResolver = $nameResolver;
+		return $this;
 	}
 
 
@@ -143,7 +177,7 @@ class NamespaceManager extends Object
 			$this->lists[$name]['parsed'] = array();
 
 			foreach ($this->lists[$name]['images'] as $image) {
-				$this->lists[$name]['parsed'][] = $this->imagesManager->createImage($this->name, $image);
+				$this->lists[$name]['parsed'][] = $this->imagesManager->createImage($this->name, new ParsedName($image));
 			}
 		}
 

@@ -20,6 +20,9 @@ class ImagesManager extends Object
 	/** @var \Nette\Http\Request */
 	private $httpRequest;
 
+	/** @var \DK\ImagesManager\INameResolver */
+	private $nameResolver;
+
 	/** @var string */
 	private $basePath;
 
@@ -46,6 +49,7 @@ class ImagesManager extends Object
 
 
 	/**
+	 * @param \DK\ImagesManager\INameResolver $nameResolver
 	 * @param string $basePath
 	 * @param string $baseUrl
 	 * @param string $imagesMask
@@ -55,8 +59,9 @@ class ImagesManager extends Object
 	 * @param int $quality
 	 * @param \Nette\Http\Request $httpRequest
 	 */
-	public function __construct($basePath, $baseUrl, $imagesMask, $thumbnailsMask, $resizeFlag, $default, $quality, Request $httpRequest)
+	public function __construct(INameResolver $nameResolver, $basePath, $baseUrl, $imagesMask, $thumbnailsMask, $resizeFlag, $default, $quality, Request $httpRequest)
 	{
+		$this->nameResolver = $nameResolver;
 		$this->httpRequest = $httpRequest;
 		$this->basePath = $basePath;
 		$this->baseUrl = $baseUrl;
@@ -124,7 +129,7 @@ class ImagesManager extends Object
 	public function getNamespace($name)
 	{
 		if (!isset($this->namespaces[$name])) {
-			$manager = new NamespaceManager($name);
+			$manager = new NamespaceManager($name, $this->nameResolver);
 			$manager
 				->setDefault($this->default)
 				->setResizeFlag($this->resizeFlag)
@@ -170,7 +175,7 @@ class ImagesManager extends Object
 		$result = array();
 		foreach (Finder::findFiles($finderMask)->in($directory) as $name => $file) {
 			if ($match = Strings::match($name, $mask)) {
-				$result[] = $this->createImage($namespace, $match['name']. '.'. $match['extension']);
+				$result[] = $this->createImage($namespace, new ParsedName($match['name']. '.'. $match['extension']));
 			}
 		}
 
@@ -199,7 +204,7 @@ class ImagesManager extends Object
 			$info = Helpers::parseFileName($name, $mask);
 
 			if ($info) {
-				$result[] = $this->createImage($image->getNamespace(), $image->getName())
+				$result[] = $this->createImage($image->getNamespace(), new ParsedName($image->getName()))
 					->setSize($info->size)
 					->setResizeFlag($info->resizeFlag);
 			}
@@ -211,7 +216,7 @@ class ImagesManager extends Object
 
 	/**
 	 * @param string $namespace
-	 * @param string $name
+	 * @param mixed $name
 	 * @param string|int $size
 	 * @param string $resizeFlag
 	 * @param string $default
@@ -227,27 +232,26 @@ class ImagesManager extends Object
 			$resizeFlag = $namespaceManager->getResizeFlag();
 		}
 
-		if ($default === null) {
-			$default = $namespaceManager->getDefault();
-		}
-
 		if ($quality === null) {
 			$quality = $namespaceManager->getQuality();
 		}
 
-		if ($name === null) {
-			$name = $default;
-			$default = null;
-		}
-
 		$image = $this->createImage($namespace, $name);
 
-		if (!$image->isExists() && $default) {
-			$image = $this->createImage($namespace, $default);
+		if (!$image->isExists() && $default !== false) {
+			if ($default === null) {
+				if (($default = $namespaceManager->getNameResolver()->getDefaultName($name)) === null) {
+					$default = $namespaceManager->getDefault();
+				}
+			}
+
+			if ($default !== null) {
+				$image = $this->createImage($namespace, new ParsedName($default));
+			}
 		}
 
 		if (!$image->isExists()) {
-			throw new ImageNotExistsException('Image "'. $name. '" does not exists.');
+			throw new ImageNotExistsException('Image "'. $namespaceManager->getNameResolver()->translateName($name). '" does not exists.');
 		}
 
 		if ($resizeFlag !== null) {
@@ -264,11 +268,17 @@ class ImagesManager extends Object
 
 	/**
 	 * @param string $namespace
-	 * @param string $name
+	 * @param mixed $name
 	 * @return \DK\ImagesManager\Image
 	 */
 	public function createImage($namespace, $name)
 	{
+		if ($name instanceof ParsedName) {
+			$name = $name->getName();
+		} else {
+			$name = $this->getNamespace($namespace)->getNameResolver()->translateName($name);
+		}
+
 		$image = new Image($namespace, $name, $this->httpRequest);
 
 		$image
@@ -284,7 +294,7 @@ class ImagesManager extends Object
 	/**
 	 * @param \Nette\Utils\Image $image
 	 * @param string $namespace
-	 * @param string $name
+	 * @param mixed $name
 	 * @param int $quality
 	 * @return \DK\ImagesManager\Image
 	 */

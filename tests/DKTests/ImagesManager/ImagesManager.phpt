@@ -11,6 +11,7 @@ namespace DKTests\ImagesManager;
 
 require_once __DIR__. '/../bootstrap.php';
 
+use DK\ImagesManager\INameResolver;
 use Nette\Utils\Image as NetteImage;
 use Tester\Assert;
 use DK\ImagesManager\Image;
@@ -41,15 +42,6 @@ class ImagesManagerTest extends TestCase
 	}
 
 
-	public function testLoad_null()
-	{
-		$manager = $this->getManager();
-		$image = $manager->load('dots', null);
-
-		Assert::same('default.jpg', $image->getName());
-	}
-
-
 	public function testLoad_not_exists()
 	{
 		$manager = $this->getManager();
@@ -67,6 +59,48 @@ class ImagesManagerTest extends TestCase
 		Assert::exception(function() use ($manager) {
 			$manager->load('dots', 'pink.jpg', null, null, false);
 		}, 'DK\ImagesManager\ImageNotExistsException', 'Image "pink.jpg" does not exists.');
+	}
+
+
+	public function testLoad_customNameResolver()
+	{
+		$manager = $this->getManager();
+		$manager->getNamespace('dots')->setNameResolver(new ArrayNameResolver);
+
+		$image = $manager->load('dots', array(
+			'name' => 'black',
+			'extension' => 'jpg',
+		));
+
+		Assert::same('black.jpg', $image->getName());
+	}
+
+
+	public function testLoad_customNameResolverDefault()
+	{
+		$manager = $this->getManager();
+		$manager->getNamespace('dots')->setNameResolver(new ArrayNameResolver);
+
+		$image = $manager->load('dots', array(
+			'name' => 'pink',
+			'extension' => 'jpg',
+		));
+
+		Assert::same('default.jpg', $image->getName());
+	}
+
+
+	public function testLoad_customNameResolverRewriteDefault()
+	{
+		$manager = $this->getManager();
+		$manager->getNamespace('dots')->setNameResolver(new ArrayNameResolver('black.jpg'));
+
+		$image = $manager->load('dots', array(
+			'name' => 'pink',
+			'extension' => 'jpg',
+		));
+
+		Assert::same('black.jpg', $image->getName());
 	}
 
 
@@ -120,12 +154,36 @@ class ImagesManagerTest extends TestCase
 	public function testUpload()
 	{
 		$manager = $this->getManager();
+
 		$imageSource = $manager->createImage('dots', 'newBlack.jpg');
-		$image = NetteImage::fromFile(__DIR__. '/../www/images/originalBlack.jpg');
 
 		Assert::false($imageSource->isExists());
 
+		$image = NetteImage::fromFile(__DIR__. '/../www/images/originalBlack.jpg');
 		$imageSource = $manager->upload($image, 'dots', 'newBlack.jpg');
+
+		Assert::true($imageSource->isExists());
+
+		unlink($imageSource->getPath());
+	}
+
+	public function testUpload_customNameResolver()
+	{
+		$manager = $this->getManager();
+		$manager->getNamespace('dots')->setNameResolver(new ArrayNameResolver);
+
+		$imageSource = $manager->createImage('dots', array(
+			'name' => 'newBlack',
+			'extension' => 'jpg',
+		));
+
+		Assert::false($imageSource->isExists());
+
+		$image = NetteImage::fromFile(__DIR__. '/../www/images/originalBlack.jpg');
+		$imageSource = $manager->upload($image, 'dots', array(
+			'name' => 'newBlack',
+			'extension' => 'jpg',
+		));
 
 		Assert::true($imageSource->isExists());
 
@@ -173,6 +231,46 @@ class ImagesManagerTest extends TestCase
 		}
 
 		$manager->removeImage($imageSource);
+	}
+
+}
+
+
+class ArrayNameResolver implements INameResolver
+{
+
+
+	/** @var bool */
+	private $default = false;
+
+
+	/**
+	 * @param bool $default
+	 */
+	public function __construct($default = null)
+	{
+		$this->default = $default;
+	}
+
+
+	/**
+	 * @param array $name
+	 * @return string
+	 * @throws \Exception
+	 */
+	public function translateName($name)
+	{
+		return $name['name']. '.'. $name['extension'];
+	}
+
+
+	/**
+	 * @param mixed $name
+	 * @return string
+	 */
+	public function getDefaultName($name)
+	{
+		return $this->default;
 	}
 
 }

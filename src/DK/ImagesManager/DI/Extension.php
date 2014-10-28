@@ -5,6 +5,7 @@ namespace DK\ImagesManager\DI;
 use Nette\DI\CompilerExtension;
 use Nette\Configurator;
 use Nette\DI\Compiler;
+use Nette\DI\Statement;
 use Nette\Utils\Strings;
 use DK\ImagesManager\InvalidStateException;
 
@@ -26,6 +27,7 @@ class Extension extends CompilerExtension
 
 	/** @var array */
 	private $defaults = array(
+		'nameResolver' => 'DK\ImagesManager\DefaultNameResolver',
 		'resizeFlag' => 'fit',
 		'default' => 'default.jpg',
 		'quality' => null,
@@ -46,6 +48,7 @@ class Extension extends CompilerExtension
 
 		$manager = $builder->addDefinition($this->prefix('manager'))
 			->setClass('DK\ImagesManager\ImagesManager', array(
+				new Statement($config['nameResolver']),
 				$config['basePath'],
 				$config['baseUrl'],
 				$config['mask']['images'],
@@ -69,8 +72,10 @@ class Extension extends CompilerExtension
 				$definition['default'] = $definition['lists'][$listName];
 			}
 
+			$nameResolver = isset($definition['nameResolver']) ? $definition['nameResolver'] : $config['nameResolver'];
+
 			$namespace = $builder->addDefinition($this->prefix("namespace.$name"))
-				->setClass('DK\ImagesManager\NamespaceManager', array($name))
+				->setClass('DK\ImagesManager\NamespaceManager', array($name, new Statement($nameResolver)))
 				->setAutowired(false)
 				->addSetup('setDefault', array($definition['default']))
 				->addSetup('setResizeFlag', array(isset($definition['resizeFlag']) ? $definition['resizeFlag'] : $config['resizeFlag']))
