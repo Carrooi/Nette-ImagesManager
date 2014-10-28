@@ -192,6 +192,9 @@ class ImagesManagerTest extends TestCase
 			'default.jpg',
 		));
 
+		sort($expect, SORT_STRING);
+		sort($images, SORT_STRING);
+
 		Assert::equal($expect, $images);
 	}
 
@@ -212,6 +215,9 @@ class ImagesManagerTest extends TestCase
 			'fill_200',
 			'stretch_20x55',
 		));
+
+		sort($expect, SORT_STRING);
+		sort($thumbnails, SORT_STRING);
 
 		Assert::equal($expect, $thumbnails);
 	}
