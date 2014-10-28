@@ -152,6 +152,9 @@ You can even use names without files' extensions and images-manager will try to 
 <img n:src="users, david, 100">
 ```
 
+**Found files' extensions are cached, so if you change some image in other way than with this package, you'll have to 
+delete cache by hand.**
+
 ### Name resolvers
 
 With default setup, you have to use string names like `david.jpg`. But for users it would be better to use eg. their 
@@ -347,6 +350,7 @@ $thumbnails = $imagesManager->findThumbnails($image);
 ```
 images:
 
+	nameResolver: DK\ImagesManager\DefaultNameResolver
 	cacheStorage: @cacheStorage
 	resizeFlag: fit
 	default: default.jpg
@@ -373,6 +377,7 @@ images:
 	namespaces:
 	
 		users:
+			nameResolver: @App\CustomNameResolver
 			default: avatar.png
 			resizeFlag: stretch
 			quality: 100
