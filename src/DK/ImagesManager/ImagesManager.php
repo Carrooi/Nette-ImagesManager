@@ -345,7 +345,7 @@ class ImagesManager extends Object
 			$dir = pathinfo($path, PATHINFO_DIRNAME);
 
 			foreach (Finder::findFiles($shortName)->in($dir) as $image => $file) {		/** @var $file \SplFileInfo */
-				return $file->getExtension();
+				return pathinfo($image, PATHINFO_EXTENSION);		// because of PHP 5.3.3 https://travis-ci.org/sakren/nette-images-manager/jobs/39295898
 			}
 
 			return null;
