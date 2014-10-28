@@ -296,9 +296,9 @@ class Image extends Object
 	public function getExpandedName()
 	{
 		if ($this->isThumbnail()) {
-			return Helpers::expand($this->thumbnailsMask, $this);
+			return Helpers::expandFromImage($this->thumbnailsMask, $this);
 		} else {
-			return Helpers::expand($this->imagesMask, $this);
+			return Helpers::expandFromImage($this->imagesMask, $this);
 		}
 	}
 
@@ -308,7 +308,7 @@ class Image extends Object
 	 */
 	public function getOriginalPath()
 	{
-		return $this->basePath. DIRECTORY_SEPARATOR. Helpers::expand($this->imagesMask, $this);
+		return $this->basePath. DIRECTORY_SEPARATOR. Helpers::expandFromImage($this->imagesMask, $this);
 	}
 
 

@@ -191,7 +191,7 @@ class ImagesManager extends Object
 	{
 		$path = $image->getBasePath(). DIRECTORY_SEPARATOR. $image->getThumbnailsMask();
 
-		$path = Helpers::expand($path, $image, false);
+		$path = Helpers::expandFromImage($path, $image, false);
 
 		$pos = mb_strrpos($path, DIRECTORY_SEPARATOR);
 		$directory = mb_substr($path, 0, $pos);
