@@ -2,8 +2,9 @@
 
 namespace DKTests\ImagesManager;
 
-use Tester\TestCase as BaseTestCase;
 use Nette\Configurator;
+use Tester\Environment;
+use Tester\TestCase as BaseTestCase;
 use DK\ImagesManager\DI\Extension;
 
 /**
@@ -16,6 +17,18 @@ class TestCase extends BaseTestCase
 
 	/** @var \Nette\DI\Container */
 	protected $context;
+
+
+	public function tearDown()
+	{
+		$this->context = null;
+	}
+
+
+	protected function lock()
+	{
+		Environment::lock('images-manager', __DIR__. '/../../tmp');
+	}
 
 
 	/**

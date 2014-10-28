@@ -143,8 +143,17 @@ This step also couldn't be easier, because there are some Latte macros registere
 
 *thumbnail with different resize method (default is [fit](http://api.nette.org/2.2.2/source-Utils.Image.php.html#106-107)):*
 ```html
-<img n:src="users", 'david.jpg', 150, stretch">
+<img n:src="users, 'david.jpg', 150, stretch">
 ```
+
+You can even use names without files' extensions and images-manager will try to find it for you:
+
+```html
+<img n:src="users, david, 100">
+```
+
+**Found files' extensions are cached, so if you change some image in other way than with this package, you'll have to 
+delete cache by hand.**
 
 ### Other Latte macros
 
@@ -223,6 +232,76 @@ There is also possibility to change that name "on the fly", which can come in ha
 
 Notice that 4th parameter is null and that's because we do not want to change resize method.
 
+### Name resolvers
+
+With default setup, you have to use string names like `david.jpg`. But for users it would be better to use eg. their 
+entities:
+
+```html
+{foreach $users as $userEntity}
+	<img n:src="users, $userEntity, 150">
+{/foreach}
+```
+
+Now you'll be able for example decide if you need to show male or female default photo much more easily. You only have to 
+register custom name resolver.
+
+```php
+namespace App\Images;
+
+use DK\ImagesManager\INameResolver;
+use App\Model\Entities\User;
+use Exception;
+
+class UserEntityNameResolver implements INameResolver
+{
+
+
+	/**
+	 * @param \App\Model\Entities\User $user
+	 * @return string
+	 */
+	public function translateName($user)
+	{
+		if (!$user instanceof User) {
+			throw new Exception;		// todo: better exception
+		}
+		
+		return $user->id. '.'. $user->avatarType;		// translates to eg. 5.png
+	}
+
+
+	/**
+	 * @param \App\Model\Entities\User $user
+	 * @return string
+	 */
+	public function getDefaultName($user)
+	{
+		if (!$user instanceof User) {
+			throw new Exception;		// todo: better exception
+		}
+		
+		return $user->gender->name. '.png';
+	}
+
+}
+```
+
+If you return something from `getDefaultName` method, you'll overwrite defaults from your configuration. You can leave that 
+method empty and defaults from neon configuration will be used.
+
+now just register your resolver for `users` namespace:
+
+*images.neon:*
+```
+images:
+
+	namespaces:
+	
+		users:
+			nameResolver: App\Images\UserEntityNameResolver
+```
+
 ## Loading images in PHP
 
 ```php
@@ -271,11 +350,14 @@ $thumbnails = $imagesManager->findThumbnails($image);
 ```
 images:
 
+	nameResolver: DK\ImagesManager\DefaultNameResolver
+	cacheStorage: @cacheStorage
 	resizeFlag: fit
 	default: default.jpg
 	quaility: null
 	basePath: null
 	baseUrl: null
+	caching: true
 	
 	mask:
 		images: <namespace><separator><name>.<extension>
@@ -295,6 +377,7 @@ images:
 	namespaces:
 	
 		users:
+			nameResolver: @App\CustomNameResolver
 			default: avatar.png
 			resizeFlag: stretch
 			quality: 100
@@ -354,6 +437,14 @@ All methods which returns images, returns `DK\ImagesManager\Image` class.
 | `tryCreateThumbnail` | `$quality = null`   | Create and save new thumbnail (size must be set)                               |
 
 # Changelog
+
+* 1.1.0
+	+ Some optimizations
+	* Upload method now uses quality from namespace configuration
+	* Added name resolvers
+	* Images can be loaded without their files' extensions
+	* Added caching (now using just in searching for files' extensions)
+	* Little bit better readme
 
 * 1.0.0
 	+ Initial version

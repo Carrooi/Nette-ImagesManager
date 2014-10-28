@@ -2,6 +2,8 @@
 
 namespace DK\ImagesManager;
 
+use Nette\Caching\Cache;
+use Nette\Caching\IStorage;
 use Nette\Object;
 use Nette\Utils\Image as NetteImage;
 use Nette\Utils\Strings;
@@ -17,8 +19,20 @@ class ImagesManager extends Object
 {
 
 
+	const CACHE_NAMESPACE = 'DK.ImagesManager';
+
+
 	/** @var \Nette\Http\Request */
 	private $httpRequest;
+
+	/** @var \DK\ImagesManager\INameResolver */
+	private $nameResolver;
+
+	/** @var \Nette\Caching\Cache */
+	private $cache;
+
+	/** @var bool */
+	private $caching;
 
 	/** @var string */
 	private $basePath;
@@ -41,11 +55,13 @@ class ImagesManager extends Object
 	/** @var int */
 	private $quality;
 
-	/** @var array */
+	/** @var \DK\ImagesManager\NamespaceManager[] */
 	private $namespaces = array();
 
 
 	/**
+	 * @param \DK\ImagesManager\INameResolver $nameResolver
+	 * @param \Nette\Caching\IStorage $cacheStorage
 	 * @param string $basePath
 	 * @param string $baseUrl
 	 * @param string $imagesMask
@@ -55,8 +71,9 @@ class ImagesManager extends Object
 	 * @param int $quality
 	 * @param \Nette\Http\Request $httpRequest
 	 */
-	public function __construct($basePath, $baseUrl, $imagesMask, $thumbnailsMask, $resizeFlag, $default, $quality, Request $httpRequest)
+	public function __construct(INameResolver $nameResolver, IStorage $cacheStorage, $basePath, $baseUrl, $imagesMask, $thumbnailsMask, $resizeFlag, $default, $quality, Request $httpRequest)
 	{
+		$this->nameResolver = $nameResolver;
 		$this->httpRequest = $httpRequest;
 		$this->basePath = $basePath;
 		$this->baseUrl = $baseUrl;
@@ -65,6 +82,28 @@ class ImagesManager extends Object
 		$this->resizeFlag = $resizeFlag;
 		$this->default = $default;
 		$this->quality = $quality;
+
+		$this->cache = new Cache($cacheStorage, self::CACHE_NAMESPACE);
+	}
+
+
+	/**
+	 * @return bool
+	 */
+	public function isCaching()
+	{
+		return $this->caching === true;
+	}
+
+
+	/**
+	 * @param bool $caching
+	 * @return \DK\ImagesManager\ImagesManager
+	 */
+	public function setCaching($caching = true)
+	{
+		$this->caching = $caching;
+		return $this;
 	}
 
 
@@ -105,125 +144,41 @@ class ImagesManager extends Object
 
 
 	/**
-	 * @internal
-	 * @param string $namespace
-	 * @param array $definition
-	 */
-	public function setNamespaceDefinition($namespace, array $definition)
-	{
-		$this->namespaces[$namespace] = $definition;
-	}
-
-
-	/**
-	 * @param string $namespace
-	 * @return bool
-	 */
-	private function isNamespaceDefinition($namespace)
-	{
-		return isset($this->namespaces[$namespace]);
-	}
-
-
-	/**
-	 * @param string $namespace
-	 * @return array
-	 * @throws \DK\ImagesManager\InvalidArgumentException
-	 */
-	private function &getNamespaceDefinition($namespace)
-	{
-		if (!$this->isNamespaceDefinition($namespace)) {
-			throw new InvalidArgumentException('Images namespace "'. $namespace. '" is not registered.');
-		}
-
-		$namespace = &$this->namespaces[$namespace];
-
-		return $namespace;
-	}
-
-
-	/**
-	 * @param string $namespace
 	 * @param string $name
-	 * @return \DK\ImagesManager\Image[]
-	 * @throws \DK\ImagesManager\InvalidArgumentException
+	 * @param \DK\ImagesManager\NamespaceManager $namespaceManager
+	 * @return \DK\ImagesManager\ImagesManager
 	 */
-	public function getList($namespace, $name)
+	public function addNamespace($name, NamespaceManager $namespaceManager)
 	{
-		$_namespace = &$this->getNamespaceDefinition($namespace);
-
-		if (!isset($_namespace['lists'][$name])) {
-			throw new InvalidArgumentException('Images list "'. $name. '" is not registered in "'. $namespace. '" namespace.');
-		}
-
-		if ($_namespace['lists'][$name]['parsed'] === null) {
-			$_namespace['lists'][$name]['parsed'] = array();
-
-			foreach ($_namespace['lists'][$name]['images'] as $image) {
-				$_namespace['lists'][$name]['parsed'][] = $this->createImage($namespace, $image);
-			}
-		}
-
-		return $_namespace['lists'][$name]['parsed'];
+		$this->namespaces[$name] = $namespaceManager;
+		$namespaceManager->registerImagesManager($this);
+		return $this;
 	}
 
 
 	/**
-	 * @param string $namespace
-	 * @return string
+	 * @param string $name
+	 * @return \DK\ImagesManager\NamespaceManager
 	 */
-	public function getResizeFlag($namespace)
+	public function getNamespace($name)
 	{
-		if ($this->isNamespaceDefinition($namespace)) {
-			$namespace = $this->getNamespaceDefinition($namespace);
-			return $namespace['resizeFlag'];
+		if (!isset($this->namespaces[$name])) {
+			$manager = new NamespaceManager($name, $this->nameResolver);
+			$manager
+				->setDefault($this->default)
+				->setResizeFlag($this->resizeFlag)
+				->setQuality($this->quality);
+
+			$this->addNamespace($name, $manager);
 		}
 
-		return $this->resizeFlag;
-	}
-
-
-	/**
-	 * @param string $namespace
-	 * @return string
-	 */
-	public function getDefault($namespace)
-	{
-		$default = $this->default;
-
-		if ($this->isNamespaceDefinition($namespace)) {
-			$namespace = $this->getNamespaceDefinition($namespace);
-			$default = $namespace['default'];
-		}
-
-		if (is_array($default)) {
-			$default = $default[array_rand($default)];
-		}
-
-		return $default;
-	}
-
-
-	/**
-	 * @param string $namespace
-	 * @return string
-	 */
-	public function getQuality($namespace)
-	{
-		if ($this->isNamespaceDefinition($namespace)) {
-			$namespace = $this->getNamespaceDefinition($namespace);
-			return $namespace['quality'];
-		}
-
-		return $this->quality;
+		return $this->namespaces[$name];
 	}
 
 
 	/**
 	 * @param string $namespace
 	 * @return \DK\ImagesManager\Image[]
-	 *
-	 * @todo: refactor
 	 */
 	public function findImages($namespace)
 	{
@@ -254,7 +209,7 @@ class ImagesManager extends Object
 		$result = array();
 		foreach (Finder::findFiles($finderMask)->in($directory) as $name => $file) {
 			if ($match = Strings::match($name, $mask)) {
-				$result[] = $this->createImage($namespace, $match['name']. '.'. $match['extension']);
+				$result[] = $this->createImage($namespace, new ParsedName($match['name']. '.'. $match['extension']));
 			}
 		}
 
@@ -270,7 +225,7 @@ class ImagesManager extends Object
 	{
 		$path = $image->getBasePath(). DIRECTORY_SEPARATOR. $image->getThumbnailsMask();
 
-		$path = Helpers::expand($path, $image, false);
+		$path = Helpers::expandFromImage($path, $image, false);
 
 		$pos = mb_strrpos($path, DIRECTORY_SEPARATOR);
 		$directory = mb_substr($path, 0, $pos);
@@ -283,7 +238,7 @@ class ImagesManager extends Object
 			$info = Helpers::parseFileName($name, $mask);
 
 			if ($info) {
-				$result[] = $this->createImage($image->getNamespace(), $image->getName())
+				$result[] = $this->createImage($image->getNamespace(), new ParsedName($image->getName()))
 					->setSize($info->size)
 					->setResizeFlag($info->resizeFlag);
 			}
@@ -295,7 +250,7 @@ class ImagesManager extends Object
 
 	/**
 	 * @param string $namespace
-	 * @param string $name
+	 * @param mixed $name
 	 * @param string|int $size
 	 * @param string $resizeFlag
 	 * @param string $default
@@ -305,31 +260,32 @@ class ImagesManager extends Object
 	 */
 	public function load($namespace, $name, $size = null, $resizeFlag = null, $default = null, $quality = null)
 	{
-		if ($resizeFlag === null) {
-			$resizeFlag = $this->getResizeFlag($namespace);
-		}
+		$namespaceManager = $this->getNamespace($namespace);
 
-		if ($default === null) {
-			$default = $this->getDefault($namespace);
+		if ($resizeFlag === null) {
+			$resizeFlag = $namespaceManager->getResizeFlag();
 		}
 
 		if ($quality === null) {
-			$quality = $this->getQuality($namespace);
-		}
-
-		if ($name === null) {
-			$name = $default;
-			$default = null;
+			$quality = $namespaceManager->getQuality();
 		}
 
 		$image = $this->createImage($namespace, $name);
 
-		if (!$image->isExists() && $default) {
-			$image = $this->createImage($namespace, $default);
+		if (!$image->isExists() && $default !== false) {
+			if ($default === null) {
+				if (($default = $namespaceManager->getNameResolver()->getDefaultName($name)) === null) {
+					$default = $namespaceManager->getDefault();
+				}
+			}
+
+			if ($default !== null) {
+				$image = $this->createImage($namespace, new ParsedName($default));
+			}
 		}
 
 		if (!$image->isExists()) {
-			throw new ImageNotExistsException('Image "'. $name. '" does not exists.');
+			throw new ImageNotExistsException('Image "'. $namespaceManager->getNameResolver()->translateName($name). '" does not exists.');
 		}
 
 		if ($resizeFlag !== null) {
@@ -346,11 +302,23 @@ class ImagesManager extends Object
 
 	/**
 	 * @param string $namespace
-	 * @param string $name
+	 * @param mixed $name
 	 * @return \DK\ImagesManager\Image
 	 */
 	public function createImage($namespace, $name)
 	{
+		if ($name instanceof ParsedName) {
+			$name = $name->getName();
+		} else {
+			$name = $this->getNamespace($namespace)->getNameResolver()->translateName($name);
+		}
+
+		if (pathinfo($name, PATHINFO_EXTENSION) === '') {
+			if (($extension = $this->tryFindExtension($namespace, $name)) !== null) {
+				$name .= ".$extension";
+			}
+		}
+
 		$image = new Image($namespace, $name, $this->httpRequest);
 
 		$image
@@ -364,9 +332,51 @@ class ImagesManager extends Object
 
 
 	/**
-	 * @param \Nette\Utils\Image $image
 	 * @param string $namespace
 	 * @param string $name
+	 * @return string
+	 */
+	private function tryFindExtension($namespace, $name)
+	{
+		$that = $this;
+		$find = function() use ($that, $namespace, $name) {
+			$path = Helpers::expand($that->getBasePath(). DIRECTORY_SEPARATOR. $that->getImagesMask(), $namespace, $name, '*');
+			$shortName = pathinfo($path, PATHINFO_BASENAME);
+			$dir = pathinfo($path, PATHINFO_DIRNAME);
+
+			foreach (Finder::findFiles($shortName)->in($dir) as $image => $file) {		/** @var $file \SplFileInfo */
+				return pathinfo($image, PATHINFO_EXTENSION);		// because of PHP 5.3.3 https://travis-ci.org/sakren/nette-images-manager/jobs/39295898
+			}
+
+			return null;
+		};
+
+		if ($this->isCaching()) {
+			$key = "extension/$namespace/$name";
+			$extension = $this->cache->load($key);
+
+			if ($extension === null) {
+				$extension = $find();
+				if ($extension === null) {
+					return null;
+				}
+
+				$this->cache->save($key, $extension, array(
+					Cache::TAGS => array("$namespace/$name"),
+				));
+			}
+
+			return $extension;
+		}
+
+		return $find();
+	}
+
+
+	/**
+	 * @param \Nette\Utils\Image $image
+	 * @param string $namespace
+	 * @param mixed $name
 	 * @param int $quality
 	 * @return \DK\ImagesManager\Image
 	 */
@@ -378,7 +388,7 @@ class ImagesManager extends Object
 		}
 
 		if ($quality === null) {
-			$quality = $this->quality;
+			$quality = $this->getNamespace($namespace)->getQuality();
 		}
 
 		$image->save($img->getPath(), $quality);
@@ -397,6 +407,12 @@ class ImagesManager extends Object
 		}
 
 		unlink($image->getPath());
+
+		if ($this->isCaching()) {
+			$this->cache->clean(array(
+				Cache::TAGS => array("{$image->getNamespace()}/{$image->getName()}"),
+			));
+		}
 	}
 
 

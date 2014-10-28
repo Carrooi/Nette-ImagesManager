@@ -11,8 +11,9 @@ namespace DKTests\ImagesManager;
 
 require_once __DIR__. '/../bootstrap.php';
 
-use Nette\Utils\Image as NetteImage;
 use Tester\Assert;
+use Nette\Utils\Image as NetteImage;
+use DK\ImagesManager\INameResolver;
 use DK\ImagesManager\Image;
 
 /**
@@ -21,74 +22,6 @@ use DK\ImagesManager\Image;
  */
 class ImagesManagerTest extends TestCase
 {
-
-
-	public function testGetResizeFlag()
-	{
-		$manager = $this->getManager();
-
-		Assert::same('fit', $manager->getResizeFlag('dots'));
-	}
-
-
-	public function testGetResizeFlag_custom()
-	{
-		$manager = $this->getManager();
-
-		Assert::same('stretch', $manager->getResizeFlag('colors'));
-	}
-
-
-	public function testGetDefault()
-	{
-		$manager = $this->getManager();
-
-		Assert::same('default.jpg', $manager->getDefault('dots'));
-	}
-
-
-	public function testGetDefault_custom()
-	{
-		$manager = $this->getManager();
-
-		Assert::same('white.png', $manager->getDefault('colors'));
-	}
-
-
-	public function testGetDefault_random()
-	{
-		$manager = $this->getManager();
-
-		Assert::contains($manager->getDefault('lines'), array(
-			'white.png', 'black.png'
-		));
-	}
-
-
-	public function testGetDefault_list()
-	{
-		$manager = $this->getManager();
-
-		Assert::contains($manager->getDefault('squares'), array(
-			'white.png', 'black.png'
-		));
-	}
-
-
-	public function testGetQuality()
-	{
-		$manager = $this->getManager();
-
-		Assert::null($manager->getQuality('dots'));
-	}
-
-
-	public function testGetQuality_custom()
-	{
-		$manager = $this->getManager();
-
-		Assert::same(100, $manager->getQuality('colors'));
-	}
 
 
 	public function testLoad()
@@ -104,15 +37,6 @@ class ImagesManagerTest extends TestCase
 	{
 		$manager = $this->getManager();
 		$image = $manager->load('dots', 'pink.jpg');
-
-		Assert::same('default.jpg', $image->getName());
-	}
-
-
-	public function testLoad_null()
-	{
-		$manager = $this->getManager();
-		$image = $manager->load('dots', null);
 
 		Assert::same('default.jpg', $image->getName());
 	}
@@ -138,41 +62,64 @@ class ImagesManagerTest extends TestCase
 	}
 
 
-	public function testGetList()
+	public function testLoad_withoutExtension()
 	{
 		$manager = $this->getManager();
-		$list = $manager->getList('colors', 'best');
+		$image = $manager->load('dots', 'black');
 
-		$images = array_map(function(Image $image) {
-			return $image->getNamespace(). '/' .$image->getName();
-		}, $list);
-
-		$manager->getList('colors', 'best');
-
-		Assert::equal(array(
-			'colors/black.jpg',
-			'colors/pink.png',
-		), $images);
+		Assert::contains($image->getName(), array('black.jpg', 'black.png'));
 	}
 
 
-	public function testGetList_namespace_not_exists()
+	public function testLoad_withoutExtension_notExists()
 	{
 		$manager = $this->getManager();
 
 		Assert::exception(function() use ($manager) {
-			$manager->getList('someNamespace', 'best');
-		}, 'DK\ImagesManager\InvalidArgumentException', 'Images namespace "someNamespace" is not registered.');
+			$manager->load('dots', 'red');
+		}, 'DK\ImagesManager\InvalidArgumentException', 'Name must in "<name>.<extension>" format, "red" given.');
 	}
 
 
-	public function testGetList_not_exists()
+	public function testLoad_customNameResolver()
 	{
 		$manager = $this->getManager();
+		$manager->getNamespace('dots')->setNameResolver(new ArrayNameResolver);
 
-		Assert::exception(function() use ($manager) {
-			$manager->getList('colors', 'unknown');
-		}, 'DK\ImagesManager\InvalidArgumentException', 'Images list "unknown" is not registered in "colors" namespace.');
+		$image = $manager->load('dots', array(
+			'name' => 'black',
+			'extension' => 'jpg',
+		));
+
+		Assert::same('black.jpg', $image->getName());
+	}
+
+
+	public function testLoad_customNameResolverDefault()
+	{
+		$manager = $this->getManager();
+		$manager->getNamespace('dots')->setNameResolver(new ArrayNameResolver);
+
+		$image = $manager->load('dots', array(
+			'name' => 'pink',
+			'extension' => 'jpg',
+		));
+
+		Assert::same('default.jpg', $image->getName());
+	}
+
+
+	public function testLoad_customNameResolverRewriteDefault()
+	{
+		$manager = $this->getManager();
+		$manager->getNamespace('dots')->setNameResolver(new ArrayNameResolver('black.jpg'));
+
+		$image = $manager->load('dots', array(
+			'name' => 'pink',
+			'extension' => 'jpg',
+		));
+
+		Assert::same('black.jpg', $image->getName());
 	}
 
 
@@ -191,6 +138,9 @@ class ImagesManagerTest extends TestCase
 			'black.png',
 			'default.jpg',
 		));
+
+		sort($expect, SORT_STRING);
+		sort($images, SORT_STRING);
 
 		Assert::equal($expect, $images);
 	}
@@ -213,19 +163,51 @@ class ImagesManagerTest extends TestCase
 			'stretch_20x55',
 		));
 
+		sort($expect, SORT_STRING);
+		sort($thumbnails, SORT_STRING);
+
 		Assert::equal($expect, $thumbnails);
 	}
 
 
 	public function testUpload()
 	{
+		$this->lock();
+
 		$manager = $this->getManager();
+
 		$imageSource = $manager->createImage('dots', 'newBlack.jpg');
-		$image = NetteImage::fromFile(__DIR__. '/../www/images/originalBlack.jpg');
 
 		Assert::false($imageSource->isExists());
 
+		$image = NetteImage::fromFile(__DIR__. '/../www/images/originalBlack.jpg');
 		$imageSource = $manager->upload($image, 'dots', 'newBlack.jpg');
+
+		Assert::true($imageSource->isExists());
+
+		unlink($imageSource->getPath());
+	}
+
+
+	public function testUpload_customNameResolver()
+	{
+		$this->lock();
+
+		$manager = $this->getManager();
+		$manager->getNamespace('dots')->setNameResolver(new ArrayNameResolver);
+
+		$imageSource = $manager->createImage('dots', array(
+			'name' => 'newBlack',
+			'extension' => 'jpg',
+		));
+
+		Assert::false($imageSource->isExists());
+
+		$image = NetteImage::fromFile(__DIR__. '/../www/images/originalBlack.jpg');
+		$imageSource = $manager->upload($image, 'dots', array(
+			'name' => 'newBlack',
+			'extension' => 'jpg',
+		));
 
 		Assert::true($imageSource->isExists());
 
@@ -235,6 +217,8 @@ class ImagesManagerTest extends TestCase
 
 	public function testRemoveImage()
 	{
+		$this->lock();
+
 		$manager = $this->getManager();
 		$image = NetteImage::fromFile(__DIR__. '/../www/images/originalBlack.jpg');
 
@@ -250,10 +234,14 @@ class ImagesManagerTest extends TestCase
 
 	public function testRemoveThumbnails()
 	{
+		$this->lock();
+
 		$manager = $this->getManager();
 		$image = NetteImage::fromFile(__DIR__. '/../www/images/originalBlack.jpg');
 
 		$imageSource = $manager->upload($image, 'dots', 'newBlack.jpg');
+
+		Assert::true($imageSource->isExists());
 
 		$thumbnails = array(
 			$manager->load('dots', 'newBlack.jpg', 2),
@@ -273,6 +261,46 @@ class ImagesManagerTest extends TestCase
 		}
 
 		$manager->removeImage($imageSource);
+	}
+
+}
+
+
+class ArrayNameResolver implements INameResolver
+{
+
+
+	/** @var bool */
+	private $default = false;
+
+
+	/**
+	 * @param bool $default
+	 */
+	public function __construct($default = null)
+	{
+		$this->default = $default;
+	}
+
+
+	/**
+	 * @param array $name
+	 * @return string
+	 * @throws \Exception
+	 */
+	public function translateName($name)
+	{
+		return $name['name']. '.'. $name['extension'];
+	}
+
+
+	/**
+	 * @param mixed $name
+	 * @return string
+	 */
+	public function getDefaultName($name)
+	{
+		return $this->default;
 	}
 
 }

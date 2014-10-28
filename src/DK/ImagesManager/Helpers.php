@@ -35,13 +35,12 @@ class Helpers extends Object
 			throw new InvalidArgumentException('Name must be a string, '. gettype($name). ' given.');
 		}
 
-		$pos = mb_strrpos($name, '.');
+		$shortName = pathinfo($name, PATHINFO_FILENAME);
+		$extension = pathinfo($name, PATHINFO_EXTENSION);
 
-		if ($pos === false) {
+		if ($extension === '') {
 			throw new InvalidArgumentException('Name must in "<name>.<extension>" format, "'. $name. '" given.');
 		}
-
-		$shortName = mb_substr($name, 0, $pos);
 
 		if (!Strings::match($shortName, '/^'. Image::NAME_REGEX. '$/')) {
 			throw new InvalidArgumentException('Name must in "<name>.<extension>" format, where <name> must be alphanumerical. "'. $name. '" given.');
@@ -49,7 +48,7 @@ class Helpers extends Object
 
 		return (object) array(
 			'name' => $shortName,
-			'extension' => mb_substr($name, $pos + 1),
+			'extension' => $extension,
 		);
 	}
 
@@ -114,27 +113,47 @@ class Helpers extends Object
 
 	/**
 	 * @param string $s
-	 * @param \DK\ImagesManager\Image $image
-	 * @param bool $thumbnailData
+	 * @param string $namespace
+	 * @param string $name
+	 * @param string $extension
+	 * @param string $size
+	 * @param string $resizeFlag
 	 * @return string
 	 */
-	public static function expand($s, Image $image, $thumbnailData = true)
+	public static function expand($s, $namespace, $name, $extension, $size = null, $resizeFlag = null)
 	{
 		$s = strtr($s, array(
 			'<separator>' => DIRECTORY_SEPARATOR,
-			'<namespace>' => $image->getNamespace(),
-			'<name>' => $image->getName(false),
-			'<extension>' => $image->getExtension(),
+			'<namespace>' => $namespace,
+			'<name>' => $name,
+			'<extension>' => $extension,
 		));
 
-		if ($thumbnailData) {
+		if ($size !== null && $resizeFlag !== null) {
 			$s = strtr($s, array(
-				'<size>' => $image->getSize(),
-				'<resizeFlag>' => $image->getResizeFlag(),
+				'<size>' => $size,
+				'<resizeFlag>' => $resizeFlag,
 			));
 		}
 
 		return $s;
+	}
+
+
+	/**
+	 * @param string $s
+	 * @param \DK\ImagesManager\Image $image
+	 * @param bool $thumbnailData
+	 * @return string
+	 */
+	public static function expandFromImage($s, Image $image, $thumbnailData = true)
+	{
+		if ($thumbnailData) {
+			return self::expand($s, $image->getNamespace(), $image->getName(false), $image->getExtension(), $image->getSize(), $image->getResizeFlag());
+		} else {
+			return self::expand($s, $image->getNamespace(), $image->getName(false), $image->getExtension());
+		}
+
 	}
 
 

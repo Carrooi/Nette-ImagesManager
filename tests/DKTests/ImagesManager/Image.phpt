@@ -113,6 +113,8 @@ class ImageTest extends TestCase
 
 	public function testTryCreateThumbnail()
 	{
+		$this->lock();
+
 		$manager = $this->getManager();
 		$image = $manager->load('dots', 'black.jpg')->setSize(10);
 
@@ -128,6 +130,8 @@ class ImageTest extends TestCase
 
 	public function testTryCreateThumbnail_not_thumbnail()
 	{
+		$this->lock();
+
 		$manager = $this->getManager();
 		$image = $manager->load('dots', 'black.jpg');
 
