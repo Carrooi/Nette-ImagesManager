@@ -18,6 +18,12 @@ class TestCase extends BaseTestCase
 	protected $context;
 
 
+	public function tearDown()
+	{
+		$this->context = null;
+	}
+
+
 	/**
 	 * @return \Nette\DI\Container
 	 */
