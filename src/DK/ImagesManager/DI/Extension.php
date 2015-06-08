@@ -36,7 +36,7 @@ class Extension extends CompilerExtension
 		'caching' => true,
 		'mask' => array(
 			'images' => null,
-			'thumbnails' => '<namespace><separator><name>_<resizeFlag>_<size>.<extension>',
+			'thumbnails' => null,
 		),
 		'namespaces' => array(),
 	);
@@ -70,6 +70,10 @@ class Extension extends CompilerExtension
 
 		if ($config['mask']['images']) {
 			$manager->addSetup('setImagesMask', array($config['mask']['images']));
+		}
+
+		if ($config['mask']['thumbnails']) {
+			$manager->addSetup('setThumbnailsMask', array($config['mask']['thumbnails']));
 		}
 
 		if ($config['caching']) {

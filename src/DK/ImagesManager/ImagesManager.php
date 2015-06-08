@@ -44,7 +44,7 @@ class ImagesManager extends Object
 	private $imagesMask = '<namespace><separator><name>.<extension>';
 
 	/** @var string */
-	private $thumbnailsMask;
+	private $thumbnailsMask = '<namespace><separator><name>_<resizeFlag>_<size>.<extension>';
 
 	/** @var string */
 	private $resizeFlag = 'fit';
@@ -63,14 +63,12 @@ class ImagesManager extends Object
 	 * @param \DK\ImagesManager\INameResolver $nameResolver
 	 * @param string $basePath
 	 * @param string $baseUrl
-	 * @param string $thumbnailsMask
 	 */
-	public function __construct(INameResolver $nameResolver, $basePath, $baseUrl, $thumbnailsMask)
+	public function __construct(INameResolver $nameResolver, $basePath, $baseUrl)
 	{
 		$this->nameResolver = $nameResolver;
 		$this->basePath = $basePath;
 		$this->baseUrl = $baseUrl;
-		$this->thumbnailsMask = $thumbnailsMask;
 	}
 
 
@@ -246,6 +244,17 @@ class ImagesManager extends Object
 	public function getThumbnailsMask()
 	{
 		return $this->thumbnailsMask;
+	}
+
+
+	/**
+	 * @param string $thumbnailsMask
+	 * @return $this
+	 */
+	public function setThumbnailsMask($thumbnailsMask)
+	{
+		$this->thumbnailsMask = $thumbnailsMask;
+		return $this;
 	}
 
 
