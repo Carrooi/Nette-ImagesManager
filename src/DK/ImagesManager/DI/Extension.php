@@ -35,7 +35,7 @@ class Extension extends CompilerExtension
 		'baseUrl' => null,
 		'caching' => true,
 		'mask' => array(
-			'images' => '<namespace><separator><name>.<extension>',
+			'images' => null,
 			'thumbnails' => '<namespace><separator><name>_<resizeFlag>_<size>.<extension>',
 		),
 		'namespaces' => array(),
@@ -52,7 +52,6 @@ class Extension extends CompilerExtension
 				new Statement($config['nameResolver']),
 				$config['basePath'],
 				$config['baseUrl'],
-				$config['mask']['images'],
 				$config['mask']['thumbnails'],
 			))
 			->addSetup('setHostFromUrl', array('@Nette\Http\Request::url'));
@@ -67,6 +66,10 @@ class Extension extends CompilerExtension
 
 		if ($config['quality']) {
 			$manager->addSetup('setQuality', array($config['quality']));
+		}
+
+		if ($config['mask']['images']) {
+			$manager->addSetup('setImagesMask', array($config['mask']['images']));
 		}
 
 		if ($config['caching']) {

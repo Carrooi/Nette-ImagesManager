@@ -41,7 +41,7 @@ class ImagesManager extends Object
 	private $baseUrl;
 
 	/** @var string */
-	private $imagesMask;
+	private $imagesMask = '<namespace><separator><name>.<extension>';
 
 	/** @var string */
 	private $thumbnailsMask;
@@ -63,15 +63,13 @@ class ImagesManager extends Object
 	 * @param \DK\ImagesManager\INameResolver $nameResolver
 	 * @param string $basePath
 	 * @param string $baseUrl
-	 * @param string $imagesMask
 	 * @param string $thumbnailsMask
 	 */
-	public function __construct(INameResolver $nameResolver, $basePath, $baseUrl, $imagesMask, $thumbnailsMask)
+	public function __construct(INameResolver $nameResolver, $basePath, $baseUrl, $thumbnailsMask)
 	{
 		$this->nameResolver = $nameResolver;
 		$this->basePath = $basePath;
 		$this->baseUrl = $baseUrl;
-		$this->imagesMask = $imagesMask;
 		$this->thumbnailsMask = $thumbnailsMask;
 	}
 
@@ -232,6 +230,17 @@ class ImagesManager extends Object
 
 
 	/**
+	 * @param string $imagesMask
+	 * @return $this
+	 */
+	public function setImagesMask($imagesMask)
+	{
+		$this->imagesMask = $imagesMask;
+		return $this;
+	}
+
+
+	/**
 	 * @return string
 	 */
 	public function getThumbnailsMask()
@@ -292,7 +301,7 @@ class ImagesManager extends Object
 	 */
 	public function findImages($namespace)
 	{
-		$path = $this->basePath. DIRECTORY_SEPARATOR. $this->imagesMask;
+		$path = $this->basePath. DIRECTORY_SEPARATOR. $this->getImagesMask();
 		$path = strtr($path, array(
 			'<namespace>' => $namespace,
 			'<separator>' => DIRECTORY_SEPARATOR,
@@ -304,7 +313,7 @@ class ImagesManager extends Object
 		$directory = mb_substr($path, 0, $pos);
 		$finderMask = mb_substr($path, $pos + 1);
 
-		$mask = strtr($this->imagesMask, array(
+		$mask = strtr($this->getImagesMask(), array(
 			'<namespace>' => $namespace,
 			'<separator>' => DIRECTORY_SEPARATOR,
 			'<name>' => '%name%',
