@@ -28,8 +28,8 @@ class ImagesManager extends Object
 	/** @var \Nette\Caching\Cache */
 	private $cache;
 
-	/** @var bool */
-	private $caching;
+	/** @var \Nette\Caching\IStorage */
+	private $cacheStorage;
 
 	/** @var string */
 	private $host;
@@ -61,7 +61,6 @@ class ImagesManager extends Object
 
 	/**
 	 * @param \DK\ImagesManager\INameResolver $nameResolver
-	 * @param \Nette\Caching\IStorage $cacheStorage
 	 * @param string $basePath
 	 * @param string $baseUrl
 	 * @param string $imagesMask
@@ -70,7 +69,7 @@ class ImagesManager extends Object
 	 * @param string $default
 	 * @param int $quality
 	 */
-	public function __construct(INameResolver $nameResolver, IStorage $cacheStorage, $basePath, $baseUrl, $imagesMask, $thumbnailsMask, $resizeFlag, $default, $quality)
+	public function __construct(INameResolver $nameResolver, $basePath, $baseUrl, $imagesMask, $thumbnailsMask, $resizeFlag, $default, $quality)
 	{
 		$this->nameResolver = $nameResolver;
 		$this->basePath = $basePath;
@@ -80,8 +79,6 @@ class ImagesManager extends Object
 		$this->resizeFlag = $resizeFlag;
 		$this->default = $default;
 		$this->quality = $quality;
-
-		$this->cache = new Cache($cacheStorage, self::CACHE_NAMESPACE);
 	}
 
 
@@ -90,18 +87,35 @@ class ImagesManager extends Object
 	 */
 	public function isCaching()
 	{
-		return $this->caching === true;
+		return $this->cacheStorage !== null;
 	}
 
 
 	/**
-	 * @param bool $caching
-	 * @return \DK\ImagesManager\ImagesManager
+	 * @param \Nette\Caching\IStorage $storage
+	 * @return $this
 	 */
-	public function setCaching($caching = true)
+	public function setCaching(IStorage $storage)
 	{
-		$this->caching = $caching;
+		$this->cacheStorage = $storage;
 		return $this;
+	}
+
+
+	/**
+	 * @return \Nette\Caching\Cache
+	 */
+	private function getCache()
+	{
+		if (!$this->isCaching()) {
+			throw new InvalidStateException('Caching is not allowed.');
+		}
+
+		if (!$this->cache) {
+			$this->cache = new Cache($this->cacheStorage, self::CACHE_NAMESPACE);
+		}
+
+		return $this->cache;
 	}
 
 
@@ -383,7 +397,7 @@ class ImagesManager extends Object
 
 		if ($this->isCaching()) {
 			$key = "extension/$namespace/$name";
-			$extension = $this->cache->load($key);
+			$extension = $this->getCache()->load($key);
 
 			if ($extension === null) {
 				$extension = $find();
@@ -391,7 +405,7 @@ class ImagesManager extends Object
 					return null;
 				}
 
-				$this->cache->save($key, $extension, array(
+				$this->getCache()->save($key, $extension, array(
 					Cache::TAGS => array("$namespace/$name"),
 				));
 			}
@@ -439,7 +453,7 @@ class ImagesManager extends Object
 		unlink($image->getPath());
 
 		if ($this->isCaching()) {
-			$this->cache->clean(array(
+			$this->getCache()->clean(array(
 				Cache::TAGS => array("{$image->getNamespace()}/{$image->getName()}"),
 			));
 		}
