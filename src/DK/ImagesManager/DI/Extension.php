@@ -28,7 +28,7 @@ class Extension extends CompilerExtension
 	/** @var array */
 	private $defaults = array(
 		'nameResolver' => 'DK\ImagesManager\DefaultNameResolver',
-		'resizeFlag' => 'fit',
+		'resizeFlag' => null,
 		'default' => 'default.jpg',
 		'quality' => null,
 		'basePath' => null,
@@ -54,11 +54,14 @@ class Extension extends CompilerExtension
 				$config['baseUrl'],
 				$config['mask']['images'],
 				$config['mask']['thumbnails'],
-				$config['resizeFlag'],
 				$config['default'],
 				$config['quality'],
 			))
 			->addSetup('setHostFromUrl', array('@Nette\Http\Request::url'));
+
+		if ($config['resizeFlag']) {
+			$manager->addSetup('setResizeFlag', array($config['resizeFlag']));
+		}
 
 		if ($config['caching']) {
 			$manager->addSetup('setCaching', array('@Nette\Caching\IStorage'));
@@ -84,8 +87,11 @@ class Extension extends CompilerExtension
 				->setClass('DK\ImagesManager\NamespaceManager', array($name, new Statement($nameResolver)))
 				->setAutowired(false)
 				->addSetup('setDefault', array($definition['default']))
-				->addSetup('setResizeFlag', array(isset($definition['resizeFlag']) ? $definition['resizeFlag'] : $config['resizeFlag']))
 				->addSetup('setQuality', array(isset($definition['quality']) ? $definition['quality'] : $config['quality']));
+
+			if (isset($definition['resizeFlag'])) {
+				$namespace->addSetup('setResizeFlag', array($definition['resizeFlag']));
+			}
 
 			if (isset($definition['lists'])) {
 				foreach ($definition['lists'] as $listName => $images){

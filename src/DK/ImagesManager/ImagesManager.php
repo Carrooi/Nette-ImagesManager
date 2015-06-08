@@ -47,7 +47,7 @@ class ImagesManager extends Object
 	private $thumbnailsMask;
 
 	/** @var string */
-	private $resizeFlag;
+	private $resizeFlag = 'fit';
 
 	/** @var string */
 	private $default;
@@ -65,18 +65,16 @@ class ImagesManager extends Object
 	 * @param string $baseUrl
 	 * @param string $imagesMask
 	 * @param string $thumbnailsMask
-	 * @param string $resizeFlag
 	 * @param string $default
 	 * @param int $quality
 	 */
-	public function __construct(INameResolver $nameResolver, $basePath, $baseUrl, $imagesMask, $thumbnailsMask, $resizeFlag, $default, $quality)
+	public function __construct(INameResolver $nameResolver, $basePath, $baseUrl, $imagesMask, $thumbnailsMask, $default, $quality)
 	{
 		$this->nameResolver = $nameResolver;
 		$this->basePath = $basePath;
 		$this->baseUrl = $baseUrl;
 		$this->imagesMask = $imagesMask;
 		$this->thumbnailsMask = $thumbnailsMask;
-		$this->resizeFlag = $resizeFlag;
 		$this->default = $default;
 		$this->quality = $quality;
 	}
@@ -116,6 +114,26 @@ class ImagesManager extends Object
 		}
 
 		return $this->cache;
+	}
+
+
+	/**
+	 * @return string
+	 */
+	public function getResizeFlag()
+	{
+		return $this->resizeFlag;
+	}
+
+
+	/**
+	 * @param string $resizeFlag
+	 * @return $this
+	 */
+	public function setResizeFlag($resizeFlag)
+	{
+		$this->resizeFlag = $resizeFlag;
+		return $this;
 	}
 
 
@@ -195,6 +213,11 @@ class ImagesManager extends Object
 	{
 		$this->namespaces[$name] = $namespaceManager;
 		$namespaceManager->registerImagesManager($this);
+
+		if (!$namespaceManager->getResizeFlag()) {
+			$namespaceManager->setResizeFlag($this->getResizeFlag());
+		}
+
 		return $this;
 	}
 
@@ -209,7 +232,7 @@ class ImagesManager extends Object
 			$manager = new NamespaceManager($name, $this->nameResolver);
 			$manager
 				->setDefault($this->default)
-				->setResizeFlag($this->resizeFlag)
+				->setResizeFlag($this->getResizeFlag())
 				->setQuality($this->quality);
 
 			$this->addNamespace($name, $manager);
