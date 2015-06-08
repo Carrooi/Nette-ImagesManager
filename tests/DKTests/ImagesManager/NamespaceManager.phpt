@@ -11,7 +11,6 @@ namespace DKTests\ImagesManager;
 
 require_once __DIR__. '/../bootstrap.php';
 
-use Nette\Utils\Image as NetteImage;
 use Tester\Assert;
 use DK\ImagesManager\Image;
 
@@ -79,7 +78,7 @@ class NamespaceManagerTest extends TestCase
 	{
 		$namespace = $this->getManager()->getNamespace('dots');
 
-		Assert::null($namespace->getQuality());
+		Assert::same(90, $namespace->getQuality());
 	}
 
 

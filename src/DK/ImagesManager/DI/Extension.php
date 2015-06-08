@@ -54,7 +54,6 @@ class Extension extends CompilerExtension
 				$config['baseUrl'],
 				$config['mask']['images'],
 				$config['mask']['thumbnails'],
-				$config['quality'],
 			))
 			->addSetup('setHostFromUrl', array('@Nette\Http\Request::url'));
 
@@ -64,6 +63,10 @@ class Extension extends CompilerExtension
 
 		if ($config['default']) {
 			$manager->addSetup('setDefault', array($config['default']));
+		}
+
+		if ($config['quality']) {
+			$manager->addSetup('setQuality', array($config['quality']));
 		}
 
 		if ($config['caching']) {
@@ -80,6 +83,10 @@ class Extension extends CompilerExtension
 
 			if (isset($definition['resizeFlag'])) {
 				$namespace->addSetup('setResizeFlag', array($definition['resizeFlag']));
+			}
+
+			if (isset($definition['quality'])) {
+				$namespace->addSetup('setQuality', array($definition['quality']));
 			}
 
 			if (isset($definition['default'])) {

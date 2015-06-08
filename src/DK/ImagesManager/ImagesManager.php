@@ -53,7 +53,7 @@ class ImagesManager extends Object
 	private $default = 'default.jpg';
 
 	/** @var int */
-	private $quality;
+	private $quality = 90;
 
 	/** @var \DK\ImagesManager\NamespaceManager[] */
 	private $namespaces = array();
@@ -65,16 +65,14 @@ class ImagesManager extends Object
 	 * @param string $baseUrl
 	 * @param string $imagesMask
 	 * @param string $thumbnailsMask
-	 * @param int $quality
 	 */
-	public function __construct(INameResolver $nameResolver, $basePath, $baseUrl, $imagesMask, $thumbnailsMask, $quality)
+	public function __construct(INameResolver $nameResolver, $basePath, $baseUrl, $imagesMask, $thumbnailsMask)
 	{
 		$this->nameResolver = $nameResolver;
 		$this->basePath = $basePath;
 		$this->baseUrl = $baseUrl;
 		$this->imagesMask = $imagesMask;
 		$this->thumbnailsMask = $thumbnailsMask;
-		$this->quality = $quality;
 	}
 
 
@@ -151,6 +149,26 @@ class ImagesManager extends Object
 	public function setDefault($default)
 	{
 		$this->default = $default;
+		return $this;
+	}
+
+
+	/**
+	 * @return int
+	 */
+	public function getQuality()
+	{
+		return $this->quality;
+	}
+
+
+	/**
+	 * @param int $quality
+	 * @return $this
+	 */
+	public function setQuality($quality)
+	{
+		$this->quality = $quality;
 		return $this;
 	}
 
@@ -240,6 +258,10 @@ class ImagesManager extends Object
 			$namespaceManager->setDefault($this->getDefault());
 		}
 
+		if (!$namespaceManager->getQuality()) {
+			$namespaceManager->setQuality($this->getQuality());
+		}
+
 		return $this;
 	}
 
@@ -255,7 +277,7 @@ class ImagesManager extends Object
 			$manager
 				->setDefault($this->getDefault())
 				->setResizeFlag($this->getResizeFlag())
-				->setQuality($this->quality);
+				->setQuality($this->getQuality());
 
 			$this->addNamespace($name, $manager);
 		}
