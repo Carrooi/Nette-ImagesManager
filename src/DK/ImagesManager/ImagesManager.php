@@ -4,11 +4,11 @@ namespace DK\ImagesManager;
 
 use Nette\Caching\Cache;
 use Nette\Caching\IStorage;
+use Nette\Http\Url;
 use Nette\Object;
 use Nette\Utils\Image as NetteImage;
 use Nette\Utils\Strings;
 use Nette\Utils\Finder;
-use Nette\Http\Request;
 use DK\ImagesManager\Latte\Helpers as TemplateHelpers;
 
 /**
@@ -22,9 +22,6 @@ class ImagesManager extends Object
 	const CACHE_NAMESPACE = 'DK.ImagesManager';
 
 
-	/** @var \Nette\Http\Request */
-	private $httpRequest;
-
 	/** @var \DK\ImagesManager\INameResolver */
 	private $nameResolver;
 
@@ -33,6 +30,9 @@ class ImagesManager extends Object
 
 	/** @var bool */
 	private $caching;
+
+	/** @var string */
+	private $host;
 
 	/** @var string */
 	private $basePath;
@@ -69,12 +69,10 @@ class ImagesManager extends Object
 	 * @param string $resizeFlag
 	 * @param string $default
 	 * @param int $quality
-	 * @param \Nette\Http\Request $httpRequest
 	 */
-	public function __construct(INameResolver $nameResolver, IStorage $cacheStorage, $basePath, $baseUrl, $imagesMask, $thumbnailsMask, $resizeFlag, $default, $quality, Request $httpRequest)
+	public function __construct(INameResolver $nameResolver, IStorage $cacheStorage, $basePath, $baseUrl, $imagesMask, $thumbnailsMask, $resizeFlag, $default, $quality)
 	{
 		$this->nameResolver = $nameResolver;
-		$this->httpRequest = $httpRequest;
 		$this->basePath = $basePath;
 		$this->baseUrl = $baseUrl;
 		$this->imagesMask = $imagesMask;
@@ -103,6 +101,37 @@ class ImagesManager extends Object
 	public function setCaching($caching = true)
 	{
 		$this->caching = $caching;
+		return $this;
+	}
+
+
+	/**
+	 * @return string
+	 */
+	public function getHost()
+	{
+		return $this->host;
+	}
+
+
+	/**
+	 * @param string $host
+	 * @return $this
+	 */
+	public function setHost($host)
+	{
+		$this->host = $host;
+		return $this;
+	}
+
+
+	/**
+	 * @param \Nette\Http\Url $url
+	 * @return $this
+	 */
+	public function setHostFromUrl(Url $url)
+	{
+		$this->host = $url->getScheme(). '://'. $url->getHost();
 		return $this;
 	}
 
@@ -319,9 +348,10 @@ class ImagesManager extends Object
 			}
 		}
 
-		$image = new Image($namespace, $name, $this->httpRequest);
+		$image = new Image($namespace, $name);
 
 		$image
+			->setHost($this->host)
 			->setBasePath($this->getBasePath())
 			->setBaseUrl($this->getBaseUrl())
 			->setImagesMask($this->getImagesMask())
@@ -437,4 +467,3 @@ class ImagesManager extends Object
 	}
 
 }
- 

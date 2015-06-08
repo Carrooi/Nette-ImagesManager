@@ -60,7 +60,8 @@ class Extension extends CompilerExtension
 				$config['default'],
 				$config['quality'],
 			))
-			->addSetup('setCaching', array($config['caching']));
+			->addSetup('setCaching', array($config['caching']))
+			->addSetup('setHostFromUrl', array('@Nette\Http\Request::url'));
 
 		foreach ($config['namespaces'] as $name => $definition) {
 			if (!isset($definition['default'])) {

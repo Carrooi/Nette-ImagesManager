@@ -5,7 +5,6 @@ namespace DK\ImagesManager;
 use Nette\Object;
 use Nette\Utils\Image as NetteImage;
 use Nette\Utils\Strings;
-use Nette\Http\Request;
 
 /**
  *
@@ -17,9 +16,6 @@ class Image extends Object
 
 	const NAME_REGEX = '[a-zA-Z0-9]+';
 
-
-	/** @var \Nette\Http\Request */
-	private $httpRequest;
 
 	/** @var string */
 	private $namespace;
@@ -40,6 +36,9 @@ class Image extends Object
 	private $resizeFlag;
 
 	/** @var string */
+	private $host;
+
+	/** @var string */
 	private $basePath;
 
 	/** @var string */
@@ -55,12 +54,9 @@ class Image extends Object
 	/**
 	 * @param string $namespace
 	 * @param string $name
-	 * @param \Nette\Http\Request $httpRequest
 	 */
-	public function __construct($namespace, $name, Request $httpRequest)
+	public function __construct($namespace, $name)
 	{
-		$this->httpRequest = $httpRequest;
-
 		$this->namespace = $namespace;
 
 		$this->setName($name);
@@ -197,6 +193,26 @@ class Image extends Object
 	public function setResizeFlag($flag)
 	{
 		$this->resizeFlag = $flag;
+		return $this;
+	}
+
+
+	/**
+	 * @return string
+	 */
+	public function getHost()
+	{
+		return $this->host;
+	}
+
+
+	/**
+	 * @param string $host
+	 * @return $this
+	 */
+	public function setHost($host)
+	{
+		$this->host = $host;
 		return $this;
 	}
 
@@ -343,8 +359,7 @@ class Image extends Object
 		}
 
 		if ($absolute) {
-			$u = $this->httpRequest->getUrl();
-			$url = $u->getScheme(). '://'. $u->getHost(). $url;
+			$url = $this->getHost(). $url;
 		}
 
 		return $url;
