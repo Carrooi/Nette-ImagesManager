@@ -29,7 +29,7 @@ class Extension extends CompilerExtension
 	private $defaults = array(
 		'nameResolver' => 'DK\ImagesManager\DefaultNameResolver',
 		'resizeFlag' => null,
-		'default' => 'default.jpg',
+		'default' => null,
 		'quality' => null,
 		'basePath' => null,
 		'baseUrl' => null,
@@ -54,7 +54,6 @@ class Extension extends CompilerExtension
 				$config['baseUrl'],
 				$config['mask']['images'],
 				$config['mask']['thumbnails'],
-				$config['default'],
 				$config['quality'],
 			))
 			->addSetup('setHostFromUrl', array('@Nette\Http\Request::url'));
@@ -63,34 +62,37 @@ class Extension extends CompilerExtension
 			$manager->addSetup('setResizeFlag', array($config['resizeFlag']));
 		}
 
+		if ($config['default']) {
+			$manager->addSetup('setDefault', array($config['default']));
+		}
+
 		if ($config['caching']) {
 			$manager->addSetup('setCaching', array('@Nette\Caching\IStorage'));
 		}
 
 		foreach ($config['namespaces'] as $name => $definition) {
-			if (!isset($definition['default'])) {
-				$definition['default'] = $config['default'];
-			}
-
-			if (is_string($definition['default']) && ($match = Strings::match($definition['default'], '/^<list\|([a-zA-Z0-9]+)>$/'))) {
-				$listName = $match[1];
-				if (!isset($definition['lists'][$listName])) {
-					throw new InvalidStateException('List "'. $listName. '" is not registered in "'. $name. '" namespace.');
-				}
-
-				$definition['default'] = $definition['lists'][$listName];
-			}
-
 			$nameResolver = isset($definition['nameResolver']) ? $definition['nameResolver'] : $config['nameResolver'];
 
 			$namespace = $builder->addDefinition($this->prefix("namespace.$name"))
 				->setClass('DK\ImagesManager\NamespaceManager', array($name, new Statement($nameResolver)))
 				->setAutowired(false)
-				->addSetup('setDefault', array($definition['default']))
 				->addSetup('setQuality', array(isset($definition['quality']) ? $definition['quality'] : $config['quality']));
 
 			if (isset($definition['resizeFlag'])) {
 				$namespace->addSetup('setResizeFlag', array($definition['resizeFlag']));
+			}
+
+			if (isset($definition['default'])) {
+				if (is_string($definition['default']) && ($match = Strings::match($definition['default'], '/^<list\|([a-zA-Z0-9]+)>$/'))) {
+					$listName = $match[1];
+					if (!isset($definition['lists'][$listName])) {
+						throw new InvalidStateException('List "'. $listName. '" is not registered in "'. $name. '" namespace.');
+					}
+
+					$definition['default'] = $definition['lists'][$listName];
+				}
+
+				$namespace->addSetup('setDefault', array($definition['default']));
 			}
 
 			if (isset($definition['lists'])) {
