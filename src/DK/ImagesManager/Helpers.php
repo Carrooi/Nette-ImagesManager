@@ -31,6 +31,10 @@ class Helpers extends Object
 	 */
 	public static function parseName($name)
 	{
+		if (is_numeric($name)) {
+			$name .= '';
+		}
+
 		if (!is_string($name)) {
 			throw new InvalidArgumentException('Name must be a string, '. gettype($name). ' given.');
 		}
