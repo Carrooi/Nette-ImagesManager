@@ -2,6 +2,8 @@
 
 namespace DK\ImagesManager\Latte;
 
+use DK\ImagesManager\ImageNotExistsException;
+use DK\ImagesManager\ImagesManager;
 use Latte\Macros\MacroSet;
 use Latte\Compiler;
 use Latte\MacroNode;
@@ -37,9 +39,7 @@ class Macros extends MacroSet
 	 */
 	public function macroImage(MacroNode $node, PhpWriter $writer)
 	{
-		$code = "\$__imageUrlTmp__ = ''; try { \$__imageUrlTmp__ = \$template->getImagesManager()->load(%node.args)->getUrl(); } catch (\\DK\\ImagesManager\\ImageNotExistsException \$e) {}";
-
-		return $writer->write("$code echo \$__imageUrlTmp__;");
+		return $writer->write("echo \\DK\\ImagesManager\\Latte\\Macros::getUrl(\$template->getImagesManager(), %node.args);");
 	}
 
 
@@ -50,9 +50,7 @@ class Macros extends MacroSet
 	 */
 	public function macroSrc(MacroNode $node, PhpWriter $writer)
 	{
-		$code = "\$__imageUrlTmp__ = ''; try { \$__imageUrlTmp__ = \$template->getImagesManager()->load(%node.args)->getUrl(); } catch (\\DK\\ImagesManager\\ImageNotExistsException \$e) {}";
-
-		return $writer->write("$code echo ' src=\"'. \$__imageUrlTmp__. '\"';");
+		return $writer->write("echo ' src=\"'. \\DK\\ImagesManager\\Latte\\Macros::getUrl(\$template->getImagesManager(), %node.args). '\"';");
 	}
 
 
@@ -67,6 +65,26 @@ class Macros extends MacroSet
 		$code = "if ($not\$template->getImagesManager()->createImage(%node.args)->isExists()) {";
 
 		return $writer->write($code);
+	}
+
+
+	/**
+	 * @param \DK\ImagesManager\ImagesManager $imagesManager
+	 * @return string
+	 */
+	public static function getUrl(ImagesManager $imagesManager)
+	{
+		$args = func_get_args();
+		array_shift($args);
+
+		try {
+			/** @var \DK\ImagesManager\Image $image */
+			$image = call_user_func_array(array($imagesManager, 'load'), $args);
+
+			return $image->getUrl();
+		} catch (ImageNotExistsException $e) {}
+
+		return '';
 	}
 
 }
