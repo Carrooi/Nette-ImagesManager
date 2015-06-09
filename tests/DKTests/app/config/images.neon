@@ -1,7 +1,7 @@
 images:
 
-	basePath: %appDir%/../www/images/base
-	baseUrl: /images/base
+	basePath: %appDir%/../www/images
+	baseUrl: /images
 
 	namespaces:
 
@@ -14,16 +14,3 @@ images:
 				best:
 					- black.jpg
 					- pink.png
-
-		lines:
-			default:
-				- white.png
-				- black.png
-
-		squares:
-			lists:
-				bestOf:
-					- white.png
-					- black.png
-
-			default: <list|bestOf>

@@ -21,6 +21,16 @@ class ImagesManager extends Object
 
 	const CACHE_NAMESPACE = 'DK.ImagesManager';
 
+	const DEFAULT_IMAGES_MASK = '<namespace><separator><name>.<extension>';
+
+	const DEFAULT_THUMBNAILS_MASK = '<namespace><separator><name>_<resizeFlag>_<size>.<extension>';
+
+	const DEFAULT_RESIZE_FLAG = 'fit';
+
+	const DEFAULT_DEFAULT_IMAGE = 'default.jpg';
+
+	const DEFAULT_QUALITY = 90;
+
 
 	/** @var \DK\ImagesManager\INameResolver */
 	private $nameResolver;
@@ -41,19 +51,19 @@ class ImagesManager extends Object
 	private $baseUrl;
 
 	/** @var string */
-	private $imagesMask = '<namespace><separator><name>.<extension>';
+	private $imagesMask = self::DEFAULT_IMAGES_MASK;
 
 	/** @var string */
-	private $thumbnailsMask = '<namespace><separator><name>_<resizeFlag>_<size>.<extension>';
+	private $thumbnailsMask = self::DEFAULT_THUMBNAILS_MASK;
 
 	/** @var string */
-	private $resizeFlag = 'fit';
+	private $resizeFlag = self::DEFAULT_RESIZE_FLAG;
 
 	/** @var string */
-	private $default = 'default.jpg';
+	private $default = self::DEFAULT_DEFAULT_IMAGE;
 
 	/** @var int */
-	private $quality = 90;
+	private $quality = self::DEFAULT_QUALITY;
 
 	/** @var \DK\ImagesManager\NamespaceManager[] */
 	private $namespaces = array();

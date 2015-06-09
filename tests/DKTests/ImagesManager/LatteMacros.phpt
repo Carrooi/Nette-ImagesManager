@@ -11,11 +11,15 @@ namespace DKTests\ImagesManager;
 
 require_once __DIR__. '/../bootstrap.php';
 
+use DK\ImagesManager\DefaultNameResolver;
+use DK\ImagesManager\Image;
+use DK\ImagesManager\ImagesManager;
 use Nette\Templating\FileTemplate;
 use Nette\Latte\Engine;
 use Tester\Assert;
 use DKTests\Mocks\Control;
 use DK\ImagesManager\Latte\Macros;
+use Tester\FileMock;
 
 /**
  *
@@ -26,10 +30,10 @@ class LatteMacrosTest extends TestCase
 
 
 	/**
-	 * @param string $name
+	 * @param string $tmpl
 	 * @return string
 	 */
-	private function renderTemplate($name)
+	private function renderTemplate($tmpl)
 	{
 		$container = $this->createContainer();
 
@@ -38,7 +42,7 @@ class LatteMacrosTest extends TestCase
 			$template = $factory->createTemplate(new Control);
 
 		} else {
-			$manager = $this->getManager();
+			$manager = new ImagesManager(new DefaultNameResolver, '', '');
 			$template = new FileTemplate;
 			$engine = new Engine;
 
@@ -48,38 +52,37 @@ class LatteMacrosTest extends TestCase
 			Macros::install($engine->getCompiler());
 		}
 
-
-		return trim($template->setFile(__DIR__. '/templates/'. $name. '.latte'));
+		return trim($template->setFile(FileMock::create($tmpl, 'latte')));
 	}
 
 
 	public function testSrcMacro()
 	{
-		$template = $this->renderTemplate('macro.src');
+		$template = $this->renderTemplate('<img n:src="dots, \'black.png\'">');
 
-		Assert::same('<img src="/images/base/dots/black.png">', $template);
+		Assert::same('<img src="/images/dots/black.png">', $template);
 	}
 
 
 	public function testSrcMacro_absolute()
 	{
-		$template = $this->renderTemplate('macro.src.absolute');
+		$template = $this->renderTemplate('<img n:src="dots, \'//black.png\'">');
 
-		Assert::same('<img src="http://localhost/images/base/dots/black.png">', $template);
+		Assert::same('<img src="http://localhost/images/dots/black.png">', $template);
 	}
 
 
 	public function testSrcMacro_default()
 	{
-		$template = $this->renderTemplate('macro.src.default');
+		$template = $this->renderTemplate('<img n:src="dots, \'pink.png\'">');
 
-		Assert::same('<img src="/images/base/dots/default.jpg">', $template);
+		Assert::same('<img src="/images/dots/default.jpg">', $template);
 	}
 
 
 	public function testSrcMacro_without_default()
 	{
-		$template = $this->renderTemplate('macro.src.without_default');
+		$template = $this->renderTemplate('<img n:src="blackness, \'green.png\'">');
 
 		Assert::same('<img src="">', $template);
 	}
@@ -87,9 +90,9 @@ class LatteMacrosTest extends TestCase
 
 	public function testSrcMacro_thumbnail()
 	{
-		$template = $this->renderTemplate('macro.src.thumbnail');
+		$template = $this->renderTemplate('<img n:src="dots, \'black.png\', \'20x55\', stretch">');
 
-		Assert::same('<img src="/images/base/dots/black_stretch_20x55.png">', $template);
+		Assert::same('<img src="/images/dots/black_stretch_20x55.png">', $template);
 	}
 
 
@@ -97,12 +100,13 @@ class LatteMacrosTest extends TestCase
 	{
 		$this->lock();
 
-		$manager = $this->getManager();
-		$image = $manager->load('dots', 'black.png')->setSize('2x3');
+		$image = new Image('dots', 'black.png');
+		$image->setBasePath(__DIR__. '/../www/images');
+		$image->setSize('2x3');
 
 		Assert::false($image->isExists());
 
-		Assert::same('<img src="/images/base/dots/black_fit_2x3.png">', $this->renderTemplate('macro.src.thumbnail.create'));
+		Assert::same('<img src="/images/dots/black_fit_2x3.png">', $this->renderTemplate('<img n:src="dots, \'black.png\', \'2x3\'">'));
 
 		Assert::true($image->isExists());
 
@@ -112,15 +116,15 @@ class LatteMacrosTest extends TestCase
 
 	public function testImageMacro()
 	{
-		$template = $this->renderTemplate('macro.image');
+		$template = $this->renderTemplate('{image dots, \'black.jpg\'}');
 
-		Assert::same('/images/base/dots/black.jpg', $template);
+		Assert::same('/images/dots/black.jpg', $template);
 	}
 
 
 	public function testIsImageMacro()
 	{
-		$template = $this->renderTemplate('macro.isImage');
+		$template = $this->renderTemplate('{isImage dots, \'black.png\'}exists{/isImage}');
 
 		Assert::same('exists', $template);
 	}
@@ -128,7 +132,7 @@ class LatteMacrosTest extends TestCase
 
 	public function testIsImage_not()
 	{
-		$template = $this->renderTemplate('macro.isImage.not');
+		$template = $this->renderTemplate('{isImage dots, \'pink.png\'}exists{/isImage}');
 
 		Assert::same('', $template);
 	}
@@ -136,15 +140,15 @@ class LatteMacrosTest extends TestCase
 
 	public function testIsImageMacro_attr()
 	{
-		$template = $this->renderTemplate('macro.isImage.attr');
+		$template = $this->renderTemplate('<img n:isImage="dots, \'black.png\'" n:src="dots, \'black.png\'">');
 
-		Assert::same('<img src="/images/base/dots/black.png">', $template);
+		Assert::same('<img src="/images/dots/black.png">', $template);
 	}
 
 
 	public function testIsNotImage()
 	{
-		$template = $this->renderTemplate('macro.isNotImage');
+		$template = $this->renderTemplate('{isNotImage dots, \'pink.png\'}not exists{/isNotImage}');
 
 		Assert::same('not exists', $template);
 	}

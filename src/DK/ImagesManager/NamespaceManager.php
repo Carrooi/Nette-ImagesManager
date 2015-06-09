@@ -22,13 +22,13 @@ class NamespaceManager extends Object
 	private $nameResolver;
 
 	/** @var string|array */
-	private $default;
+	private $default = ImagesManager::DEFAULT_DEFAULT_IMAGE;
 
 	/** @var string */
-	private $resizeFlag;
+	private $resizeFlag = ImagesManager::DEFAULT_RESIZE_FLAG;
 
 	/** @var int */
-	private $quality;
+	private $quality = ImagesManager::DEFAULT_QUALITY;
 
 	/** @var array */
 	private $lists = array();

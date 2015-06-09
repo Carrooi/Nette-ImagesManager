@@ -11,6 +11,7 @@ namespace DKTests\ImagesManager;
 
 require_once __DIR__. '/../bootstrap.php';
 
+use DK\ImagesManager\Image;
 use Tester\Assert;
 
 /**
@@ -23,35 +24,39 @@ class ImageTest extends TestCase
 
 	public function testGetPath()
 	{
-		$manager = $this->getManager();
-		$image = $manager->load('dots', 'black.jpg');
+		$image = new Image('dots', 'black.jpg');
+		$image->setBasePath('/var/www/images');
 
-		Assert::same($this->context->parameters['appDir']. '/../www/images/base/dots/black.jpg', $image->getPath());
+		Assert::same('/var/www/images/dots/black.jpg', $image->getPath());
 	}
 
 
 	public function testGetPath_thumbnail()
 	{
-		$manager = $this->getManager();
-		$image = $manager->load('dots', 'black.png')->setSize('200x50');
+		$image = new Image('dots', 'black.jpg');
+		$image->setBasePath('/var/www/images');
+		$image->setSize('200x50');
 
-		Assert::same($this->context->parameters['appDir']. '/../www/images/base/dots/black_fit_200x50.png', $image->getPath());
+		Assert::same('/var/www/images/dots/black_fit_200x50.jpg', $image->getPath());
 	}
 
 
 	public function testGetPath_thumbnail_different_resize_flag()
 	{
-		$manager = $this->getManager();
-		$image = $manager->load('dots', 'black.jpg')->setSize(50)->setResizeFlag('stretch');
+		$image = new Image('dots', 'black.jpg');
+		$image->setBasePath('/var/www/images');
+		$image->setSize(50);
+		$image->setResizeFlag('stretch');
 
-		Assert::same($this->context->parameters['appDir']. '/../www/images/base/dots/black_stretch_50.jpg', $image->getPath());
+		Assert::same('/var/www/images/dots/black_stretch_50.jpg', $image->getPath());
 	}
 
 
 	public function testIsExists_thumbnail()
 	{
-		$manager = $this->getManager();
-		$image = $manager->load('dots', 'black.jpg')->setSize(2);
+		$image = new Image('dots', 'black.jpg');
+		$image->setBasePath(__DIR__. '/../www/images');
+		$image->setSize(2);
 
 		Assert::true($image->isExists());
 	}
@@ -59,8 +64,9 @@ class ImageTest extends TestCase
 
 	public function testIsExists_thumbnail_height()
 	{
-		$manager = $this->getManager();
-		$image = $manager->load('dots', 'black.png')->setSize('50x100');
+		$image = new Image('dots', 'black.png');
+		$image->setBasePath(__DIR__. '/../www/images');
+		$image->setSize('50x100');
 
 		Assert::true($image->isExists());
 	}
@@ -68,8 +74,9 @@ class ImageTest extends TestCase
 
 	public function testIsExists_thumbnail_not_exists()
 	{
-		$manager = $this->getManager();
-		$image = $manager->load('dots', 'black.jpg')->setSize(7);
+		$image = new Image('dots', 'black.jpg');
+		$image->setBasePath(__DIR__. '/../www/images');
+		$image->setSize(7);
 
 		Assert::false($image->isExists());
 	}
@@ -77,37 +84,37 @@ class ImageTest extends TestCase
 
 	public function testGetUrl()
 	{
-		$manager = $this->getManager();
-		$image = $manager->load('dots', 'black.jpg');
+		$image = new Image('dots', 'black.jpg');
 
-		Assert::same('/images/base/dots/black.jpg', $image->getUrl());
+		Assert::same('/dots/black.jpg', $image->getUrl());
 	}
 
 
 	public function testGetUrl_absolute()
 	{
-		$manager = $this->getManager();
-		$image = $manager->load('dots', 'black.jpg');
+		$image = new Image('dots', 'black.jpg');
+		$image->setHost('http://localhost');
 
-		Assert::same('http://localhost/images/base/dots/black.jpg', $image->getUrl(true));
+		Assert::same('http://localhost/dots/black.jpg', $image->getUrl(true));
 	}
 
 
 	public function testGetUrl_thumbnail()
 	{
-		$manager = $this->getManager();
-		$image = $manager->load('dots', 'black.jpg')->setSize(4);
+		$image = new Image('dots', 'black.jpg');
+		$image->setSize(4);
 
-		Assert::same('/images/base/dots/black_fit_4.jpg', $image->getUrl());
+		Assert::same('/dots/black_fit_4.jpg', $image->getUrl());
 	}
 
 
 	public function testGetUrl_thumbnail_absolute()
 	{
-		$manager = $this->getManager();
-		$image = $manager->load('dots', 'black.jpg')->setSize(4);
+		$image = new Image('dots', 'black.jpg');
+		$image->setHost('http://localhost');
+		$image->setSize(4);
 
-		Assert::same('http://localhost/images/base/dots/black_fit_4.jpg', $image->getUrl(true));
+		Assert::same('http://localhost/dots/black_fit_4.jpg', $image->getUrl(true));
 	}
 
 
@@ -115,8 +122,9 @@ class ImageTest extends TestCase
 	{
 		$this->lock();
 
-		$manager = $this->getManager();
-		$image = $manager->load('dots', 'black.jpg')->setSize(10);
+		$image = new Image('dots', 'black.jpg');
+		$image->setBasePath(__DIR__. '/../www/images');
+		$image->setSize(10);
 
 		Assert::false($image->isExists());
 
@@ -130,10 +138,7 @@ class ImageTest extends TestCase
 
 	public function testTryCreateThumbnail_not_thumbnail()
 	{
-		$this->lock();
-
-		$manager = $this->getManager();
-		$image = $manager->load('dots', 'black.jpg');
+		$image = new Image('dots', 'black.jpg');
 
 		Assert::exception(function() use ($image) {
 			$image->tryCreateThumbnail();

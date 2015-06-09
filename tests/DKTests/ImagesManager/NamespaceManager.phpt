@@ -11,6 +11,9 @@ namespace DKTests\ImagesManager;
 
 require_once __DIR__. '/../bootstrap.php';
 
+use DK\ImagesManager\DefaultNameResolver;
+use DK\ImagesManager\ImagesManager;
+use DK\ImagesManager\NamespaceManager;
 use Tester\Assert;
 use DK\ImagesManager\Image;
 
@@ -22,69 +25,43 @@ class NamespaceManagerTest extends TestCase
 {
 
 
-	public function testGetResizeFlag()
+	public function testResizeFlag()
 	{
-		$namespace = $this->getManager()->getNamespace('dots');
+		$namespace = new NamespaceManager('dots', new DefaultNameResolver);
 
 		Assert::same('fit', $namespace->getResizeFlag());
-	}
 
-
-	public function testGetResizeFlag_custom()
-	{
-		$namespace = $this->getManager()->getNamespace('colors');
+		$namespace->setResizeFlag('stretch');
 
 		Assert::same('stretch', $namespace->getResizeFlag());
 	}
 
 
-	public function testGetDefault()
+	public function testDefault()
 	{
-		$namespace = $this->getManager()->getNamespace('dots');
+		$namespace = new NamespaceManager('dots', new DefaultNameResolver);
 
 		Assert::same('default.jpg', $namespace->getDefault());
-	}
 
+		$namespace->setDefault('default.png');
 
-	public function testGetDefault_custom()
-	{
-		$namespace = $this->getManager()->getNamespace('colors');
+		Assert::same('default.png', $namespace->getDefault());
 
-		Assert::same('white.png', $namespace->getDefault());
-	}
-
-
-	public function testGetDefault_random()
-	{
-		$namespace = $this->getManager()->getNamespace('lines');
+		$namespace->setDefault(array('default.png', 'default.jpg'));
 
 		Assert::contains($namespace->getDefault(), array(
-			'white.png', 'black.png'
+			'default.png', 'default.jpg'
 		));
 	}
 
 
-	public function testGetDefault_list()
+	public function testQuality()
 	{
-		$namespace = $this->getManager()->getNamespace('squares');
-
-		Assert::contains($namespace->getDefault(), array(
-			'white.png', 'black.png'
-		));
-	}
-
-
-	public function testGetQuality()
-	{
-		$namespace = $this->getManager()->getNamespace('dots');
+		$namespace = new NamespaceManager('dots', new DefaultNameResolver);
 
 		Assert::same(90, $namespace->getQuality());
-	}
 
-
-	public function testGetQuality_custom()
-	{
-		$namespace = $this->getManager()->getNamespace('colors');
+		$namespace->setQuality(100);
 
 		Assert::same(100, $namespace->getQuality());
 	}
@@ -92,14 +69,21 @@ class NamespaceManagerTest extends TestCase
 
 	public function testGetList()
 	{
-		$namespace = $this->getManager()->getNamespace('colors');
+		$manager = new ImagesManager(new DefaultNameResolver, '/var/www/images', '/');
+
+		$namespace = new NamespaceManager('colors', new DefaultNameResolver);
+		$namespace->registerImagesManager($manager);
+
+		$namespace->addList('best', array(
+			'black.jpg',
+			'pink.png',
+		));
+
 		$list = $namespace->getList('best');
 
 		$images = array_map(function(Image $image) {
 			return $image->getNamespace(). '/' .$image->getName();
 		}, $list);
-
-		$namespace->getList('best');
 
 		Assert::equal(array(
 			'colors/black.jpg',
@@ -110,7 +94,7 @@ class NamespaceManagerTest extends TestCase
 
 	public function testGetList_not_exists()
 	{
-		$namespace = $this->getManager()->getNamespace('colors');
+		$namespace = new NamespaceManager('colors', new DefaultNameResolver);
 
 		Assert::exception(function() use ($namespace) {
 			$namespace->getList('unknown');

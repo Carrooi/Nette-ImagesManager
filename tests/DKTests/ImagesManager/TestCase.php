@@ -56,14 +56,4 @@ class TestCase extends BaseTestCase
 		return $this->context;
 	}
 
-
-	/**
-	 * @return \DK\ImagesManager\ImagesManager
-	 */
-	protected function getManager()
-	{
-		$context = $this->createContainer();
-		return $context->getByType('DK\ImagesManager\ImagesManager');
-	}
-
 }

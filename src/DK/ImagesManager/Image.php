@@ -33,7 +33,7 @@ class Image extends Object
 	private $height;
 
 	/** @var string */
-	private $resizeFlag;
+	private $resizeFlag = ImagesManager::DEFAULT_RESIZE_FLAG;
 
 	/** @var string */
 	private $host;
@@ -45,10 +45,10 @@ class Image extends Object
 	private $baseUrl;
 
 	/** @var string */
-	private $imagesMask;
+	private $imagesMask = ImagesManager::DEFAULT_IMAGES_MASK;
 
 	/** @var string */
-	private $thumbnailsMask;
+	private $thumbnailsMask = ImagesManager::DEFAULT_THUMBNAILS_MASK;
 
 
 	/**

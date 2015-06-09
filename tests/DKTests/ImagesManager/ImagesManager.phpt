@@ -11,6 +11,8 @@ namespace DKTests\ImagesManager;
 
 require_once __DIR__. '/../bootstrap.php';
 
+use DK\ImagesManager\DefaultNameResolver;
+use DK\ImagesManager\ImagesManager;
 use Tester\Assert;
 use Nette\Utils\Image as NetteImage;
 use DK\ImagesManager\INameResolver;
@@ -26,7 +28,7 @@ class ImagesManagerTest extends TestCase
 
 	public function testLoad()
 	{
-		$manager = $this->getManager();
+		$manager = new ImagesManager(new DefaultNameResolver, __DIR__. '/../www/images', '/');
 		$image = $manager->load('dots', 'black.jpg');
 
 		Assert::same('black.jpg', $image->getName());
@@ -35,7 +37,7 @@ class ImagesManagerTest extends TestCase
 
 	public function testLoad_default()
 	{
-		$manager = $this->getManager();
+		$manager = new ImagesManager(new DefaultNameResolver, __DIR__. '/../www/images', '/');
 		$image = $manager->load('dots', 'pink.jpg');
 
 		Assert::same('default.jpg', $image->getName());
@@ -44,7 +46,7 @@ class ImagesManagerTest extends TestCase
 
 	public function testLoad_not_exists()
 	{
-		$manager = $this->getManager();
+		$manager = new ImagesManager(new DefaultNameResolver, __DIR__. '/../www/images', '/');
 
 		Assert::exception(function() use ($manager) {
 			$manager->load('blackness', 'pink.jpg');
@@ -54,7 +56,7 @@ class ImagesManagerTest extends TestCase
 
 	public function testLoad_not_exits_and_reset_default()
 	{
-		$manager = $this->getManager();
+		$manager = new ImagesManager(new DefaultNameResolver, __DIR__. '/../www/images', '/');
 
 		Assert::exception(function() use ($manager) {
 			$manager->load('dots', 'pink.jpg', null, null, false);
@@ -64,7 +66,7 @@ class ImagesManagerTest extends TestCase
 
 	public function testLoad_withoutExtension()
 	{
-		$manager = $this->getManager();
+		$manager = new ImagesManager(new DefaultNameResolver, __DIR__. '/../www/images', '/');
 		$image = $manager->load('dots', 'black');
 
 		Assert::contains($image->getName(), array('black.jpg', 'black.png'));
@@ -73,7 +75,7 @@ class ImagesManagerTest extends TestCase
 
 	public function testLoad_withoutExtension_notExists()
 	{
-		$manager = $this->getManager();
+		$manager = new ImagesManager(new DefaultNameResolver, __DIR__. '/../www/images', '/');
 
 		Assert::exception(function() use ($manager) {
 			$manager->load('dots', 'red');
@@ -83,8 +85,7 @@ class ImagesManagerTest extends TestCase
 
 	public function testLoad_customNameResolver()
 	{
-		$manager = $this->getManager();
-		$manager->getNamespace('dots')->setNameResolver(new ArrayNameResolver);
+		$manager = new ImagesManager(new ArrayNameResolver, __DIR__. '/../www/images', '/');
 
 		$image = $manager->load('dots', array(
 			'name' => 'black',
@@ -97,8 +98,7 @@ class ImagesManagerTest extends TestCase
 
 	public function testLoad_customNameResolverDefault()
 	{
-		$manager = $this->getManager();
-		$manager->getNamespace('dots')->setNameResolver(new ArrayNameResolver);
+		$manager = new ImagesManager(new ArrayNameResolver, __DIR__. '/../www/images', '/');
 
 		$image = $manager->load('dots', array(
 			'name' => 'pink',
@@ -111,8 +111,7 @@ class ImagesManagerTest extends TestCase
 
 	public function testLoad_customNameResolverRewriteDefault()
 	{
-		$manager = $this->getManager();
-		$manager->getNamespace('dots')->setNameResolver(new ArrayNameResolver('black.jpg'));
+		$manager = new ImagesManager(new ArrayNameResolver('black.jpg'), __DIR__. '/../www/images', '/');
 
 		$image = $manager->load('dots', array(
 			'name' => 'pink',
@@ -125,7 +124,7 @@ class ImagesManagerTest extends TestCase
 
 	public function testFindImages()
 	{
-		$manager = $this->getManager();
+		$manager = new ImagesManager(new DefaultNameResolver, __DIR__. '/../www/images', '/');
 
 		$images = array_map(function(Image $image) {
 			return $image->getPath();
@@ -148,8 +147,10 @@ class ImagesManagerTest extends TestCase
 
 	public function testFindThumbnails()
 	{
-		$manager = $this->getManager();
-		$image = $manager->load('dots', 'black.jpg');
+		$manager = new ImagesManager(new DefaultNameResolver, __DIR__. '/../www/images', '/');
+
+		$image = new Image('dots', 'black.jpg');
+		$image->setBasePath(__DIR__. '/../www/images');
 
 		$thumbnails = array_map(function(Image $image) {
 			return $image->getPath();
@@ -174,9 +175,10 @@ class ImagesManagerTest extends TestCase
 	{
 		$this->lock();
 
-		$manager = $this->getManager();
+		$manager = new ImagesManager(new DefaultNameResolver, __DIR__. '/../www/images', '/');
 
-		$imageSource = $manager->createImage('dots', 'newBlack.jpg');
+		$imageSource = new Image('dots', 'newBlack.jpg');
+		$imageSource->setBasePath(__DIR__. '/../www/images');
 
 		Assert::false($imageSource->isExists());
 
@@ -193,13 +195,10 @@ class ImagesManagerTest extends TestCase
 	{
 		$this->lock();
 
-		$manager = $this->getManager();
-		$manager->getNamespace('dots')->setNameResolver(new ArrayNameResolver);
+		$manager = new ImagesManager(new ArrayNameResolver, __DIR__. '/../www/images', '/');
 
-		$imageSource = $manager->createImage('dots', array(
-			'name' => 'newBlack',
-			'extension' => 'jpg',
-		));
+		$imageSource = new Image('dots', 'newBlack.jpg');
+		$imageSource->setBasePath(__DIR__. '/../www/images');
 
 		Assert::false($imageSource->isExists());
 
@@ -219,10 +218,12 @@ class ImagesManagerTest extends TestCase
 	{
 		$this->lock();
 
-		$manager = $this->getManager();
-		$image = NetteImage::fromFile(__DIR__. '/../www/images/originalBlack.jpg');
+		$manager = new ImagesManager(new DefaultNameResolver, __DIR__. '/../www/images', '/');
 
-		$imageSource = $manager->upload($image, 'dots', 'newBlack.jpg');
+		copy(__DIR__. '/../www/images/originalBlack.jpg', __DIR__. '/../www/images/dots/newBlack.jpg');
+
+		$imageSource = new Image('dots', 'newBlack.jpg');
+		$imageSource->setBasePath(__DIR__. '/../www/images');
 
 		Assert::true($imageSource->isExists());
 
@@ -236,10 +237,12 @@ class ImagesManagerTest extends TestCase
 	{
 		$this->lock();
 
-		$manager = $this->getManager();
-		$image = NetteImage::fromFile(__DIR__. '/../www/images/originalBlack.jpg');
+		$manager = new ImagesManager(new DefaultNameResolver, __DIR__. '/../www/images', '/');
 
-		$imageSource = $manager->upload($image, 'dots', 'newBlack.jpg');
+		copy(__DIR__. '/../www/images/originalBlack.jpg', __DIR__. '/../www/images/dots/newBlack.jpg');
+
+		$imageSource = new Image('dots', 'newBlack.jpg');
+		$imageSource->setBasePath(__DIR__. '/../www/images');
 
 		Assert::true($imageSource->isExists());
 
