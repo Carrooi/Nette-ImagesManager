@@ -49,7 +49,7 @@ class LatteMacrosTest extends TestCase
 		}
 
 
-		return (string) $template->setFile(__DIR__. '/templates/'. $name. '.latte');
+		return trim($template->setFile(__DIR__. '/templates/'. $name. '.latte'));
 	}
 
 

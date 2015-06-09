@@ -23,4 +23,4 @@ interface INameResolver
 	 */
 	public function getDefaultName($name);
 
-} 
+}

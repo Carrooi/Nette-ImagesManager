@@ -33,4 +33,4 @@ class ParsedName extends Object
 		return $this->name;
 	}
 
-} 
+}

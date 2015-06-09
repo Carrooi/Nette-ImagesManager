@@ -10,4 +10,3 @@ class InvalidStateException extends \RuntimeException
 {
 
 }
- 

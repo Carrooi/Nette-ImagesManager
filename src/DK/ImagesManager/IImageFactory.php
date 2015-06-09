@@ -18,4 +18,3 @@ interface IImageFactory
 	public function create($namespace, $name);
 
 }
- 

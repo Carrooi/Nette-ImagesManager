@@ -184,4 +184,4 @@ class NamespaceManager extends Object
 		return $this->lists[$name]['parsed'];
 	}
 
-} 
+}

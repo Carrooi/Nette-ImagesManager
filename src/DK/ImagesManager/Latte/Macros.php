@@ -94,4 +94,3 @@ class Macros extends MacroSet
 	}
 
 }
- 

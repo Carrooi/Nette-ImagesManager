@@ -10,4 +10,3 @@ class ImageNotExistsException extends \RuntimeException
 {
 
 }
- 

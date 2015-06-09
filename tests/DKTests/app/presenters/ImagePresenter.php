@@ -12,4 +12,3 @@ class ImagePresenter extends Presenter
 {
 
 }
- 

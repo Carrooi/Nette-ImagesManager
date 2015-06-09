@@ -12,4 +12,3 @@ class Control extends BaseControl
 {
 
 }
- 

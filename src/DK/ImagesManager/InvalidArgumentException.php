@@ -10,4 +10,3 @@ class InvalidArgumentException extends \InvalidArgumentException
 {
 
 }
- 
