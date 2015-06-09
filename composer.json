@@ -1,9 +1,9 @@
 {
-	"name": "sakren/nette-images-manager",
+	"name": "carrooi/images-manager",
 	"type": "library",
 	"description": "Images manager for Nette framework",
 	"keywords": ["nette", "image", "manager", "storage", "source", "loader"],
-	"homepage": "http://github.com/sakren/nette-images-manager",
+	"homepage": "https://github.com/Carrooi/Nette-ImagesManager/issues",
 	"license": "MIT",
 	"authors": [
 		{
@@ -13,17 +13,25 @@
 		}
 	],
 	"support": {
-		"issues": "https://github.com/sakren/nette-images-manager/issues"
+		"issues": "https://github.com/Carrooi/Nette-ImagesManager/issues"
 	},
 	"require": {
-		"nette/nette": ">= 2.1.0"
+		"nette/di": "~2.2",
+		"nette/application": "~2.2",
+		"nette/caching": "~2.2",
+		"nette/robot-loader": "~2.2",
+		"latte/latte": "~2.2"
 	},
 	"require-dev": {
-		"nette/tester": "~1.3.0"
+		"nette/bootstrap": "~2.2",
+		"nette/tester": "~1.4",
+		"nette/mail": "~2.2",
+		"nette/safe-stream": "~2.2",
+		"tracy/tracy": "~2.2"
 	},
 	"autoload": {
-		"psr-0": {
-			"DK\\ImagesManager\\": "src/"
+		"psr-4": {
+			"Carrooi\\ImagesManager\\": "src/"
 		}
 	}
 }

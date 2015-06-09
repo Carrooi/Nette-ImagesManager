@@ -1,0 +1,34 @@
+php:
+
+	date.timezone: Europe/Prague
+
+
+nette:
+
+	application:
+		mapping:
+			*: CarrooiTests\*Module\Presenters\*Presenter
+
+	session:
+		autoStart: false
+
+
+images:
+
+	basePath: %appDir%/../www/images
+	baseUrl: /images
+
+
+services:
+
+	cacheStorage:
+		class: Nette\Caching\Storages\MemoryStorage
+
+	# to lazy to create new factory service
+	router:
+		class: Nette\Application\Routers\RouteList
+		setup:
+			- '$service[] = ?'(Nette\Application\Routers\Route('<presenter>/<action>[/<id>]', 'Homepage:default'))
+
+	nette.httpRequestFactory:
+		class: CarrooiTests\Mocks\HttpRequestFactory

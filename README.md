@@ -1,5 +1,5 @@
-[![Build Status](https://travis-ci.org/sakren/nette-images-manager.png?branch=master)](https://travis-ci.org/sakren/nette-images-manager)
-[![Donate](http://b.repl.ca/v1/donate-PayPal-brightgreen.png)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=39WBDGLHF48PE)
+[![Build Status](https://img.shields.io/travis/Carrooi/Nette-ImagesManager.svg?style=flat-square)](https://travis-ci.org/Carrooi/Nette-ImagesManager)
+[![Donate](https://img.shields.io/badge/donate-PayPal-brightgreen.svg?style=flat-square)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=39WBDGLHF48PE)
 
 # Images manager
 
@@ -8,7 +8,7 @@ Images-manager is a tool for managing all of your web images (well, except templ
 ## Installation
 
 ```
-$ composer require sakren/nette-images-manager
+$ composer require carrooi/images-manager
 $ composer update
 ```
 
@@ -17,7 +17,7 @@ now you can register extension and prepare new config file for images-manager.
 *config.neon:*
 ```
 extensions:
-	images: DK\ImagesManager\DI\Extension
+	images: Carrooi\ImagesManager\DI\Extension
 	
 includes:
 	- ./images.neon
@@ -52,7 +52,7 @@ namespace App\Presenters;
 use Nette\Application\UI\Presenter;
 use Nette\Application\UI\Form;
 use Nette\Utils\ArrayHash;
-use DK\ImagesManager\ImagesManager;
+use Carrooi\ImagesManager\ImagesManager;
 
 /**
  *
@@ -62,12 +62,12 @@ class ImagesPresenter extends Presenter
 {
 
 
-	/** @var \DK\ImagesManager\ImagesManager */
+	/** @var \Carrooi\ImagesManager\ImagesManager */
 	private $imagesManager;
 	
 	
 	/**
-	 * @param \DK\ImagesManager\ImagesManager $imagesManager
+	 * @param \Carrooi\ImagesManager\ImagesManager $imagesManager
 	 */
 	public function __construct(ImagesManager $imagesManager)
 	{
@@ -144,6 +144,11 @@ This step also couldn't be easier, because there are some Latte macros registere
 *thumbnail with different resize method (default is [fit](http://api.nette.org/2.2.2/source-Utils.Image.php.html#106-107)):*
 ```html
 <img n:src="users, 'david.jpg', 150, stretch">
+```
+
+*absolute urls (works only at latte):*
+```html
+<img n:src="users, '//david.jpg'">
 ```
 
 You can even use names without files' extensions and images-manager will try to find it for you:
@@ -232,6 +237,11 @@ There is also possibility to change that name "on the fly", which can come in ha
 
 Notice that 4th parameter is null and that's because we do not want to change resize method.
 
+## Dummy images with [satyr.io](http://satyr.io/)
+
+When even default image is missing, this package will load dummy image from [satyr.io](http://satyr.io/) service. This 
+only works for images with known size.
+
 ### Name resolvers
 
 With default setup, you have to use string names like `david.jpg`. But for users it would be better to use eg. their 
@@ -249,7 +259,7 @@ register custom name resolver.
 ```php
 namespace App\Images;
 
-use DK\ImagesManager\INameResolver;
+use Carrooi\ImagesManager\INameResolver;
 use App\Model\Entities\User;
 use Exception;
 
@@ -350,7 +360,7 @@ $thumbnails = $imagesManager->findThumbnails($image);
 ```
 images:
 
-	nameResolver: DK\ImagesManager\DefaultNameResolver
+	nameResolver: Carrooi\ImagesManager\DefaultNameResolver
 	cacheStorage: @cacheStorage
 	resizeFlag: fit
 	default: default.jpg
@@ -401,9 +411,9 @@ images:
 			default: <list|avatars>
 ```
 
-# DK\ImagesManager\Image
+# Carrooi\ImagesManager\Image
 
-All methods which returns images, returns `DK\ImagesManager\Image` class.
+All methods which returns images, returns `Carrooi\ImagesManager\Image` class.
 
 **Methods:**
 
