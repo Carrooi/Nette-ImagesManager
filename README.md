@@ -237,6 +237,11 @@ There is also possibility to change that name "on the fly", which can come in ha
 
 Notice that 4th parameter is null and that's because we do not want to change resize method.
 
+## Dummy images with [satyr.io](http://satyr.io/)
+
+When even default image is missing, this package will load dummy image from [satyr.io](http://satyr.io/) service. This 
+only works for images with known size.
+
 ### Name resolvers
 
 With default setup, you have to use string names like `david.jpg`. But for users it would be better to use eg. their 

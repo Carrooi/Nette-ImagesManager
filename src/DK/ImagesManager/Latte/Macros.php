@@ -2,6 +2,7 @@
 
 namespace DK\ImagesManager\Latte;
 
+use DK\ImagesManager\Helpers as ImagesHelpers;
 use DK\ImagesManager\ImageNotExistsException;
 use DK\ImagesManager\ImagesManager;
 use Latte\Macros\MacroSet;
@@ -88,7 +89,12 @@ class Macros extends MacroSet
 			$image = call_user_func_array(array($imagesManager, 'load'), $args);
 
 			return $image->getUrl($absolute);
-		} catch (ImageNotExistsException $e) {}
+		} catch (ImageNotExistsException $e) {
+			if (count($args) > 2) {
+				$size = ImagesHelpers::parseSize($args[2]);
+				return 'http://satyr.io/'. $size->width. 'x'. ($size->height ? $size->height : $size->width);
+			}
+		}
 
 		return '';
 	}

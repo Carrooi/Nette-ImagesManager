@@ -102,6 +102,16 @@ class LatteMacrosTest extends TestCase
 	}
 
 
+	public function testSrcMacro_thumbnail_withoutDefault()
+	{
+		$template = $this->renderTemplate('<img n:src="dots, \'green.png\', 20">', function(ImagesManager $manager) {
+			$manager->setDefault(null);
+		});
+
+		Assert::same('<img src="http://satyr.io/20x20">', $template);
+	}
+
+
 	public function testSrcMacro_thumbnail_create()
 	{
 		$this->lock();
