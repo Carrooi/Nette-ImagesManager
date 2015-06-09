@@ -84,6 +84,14 @@ class LatteMacrosTest extends TestCase
 	}
 
 
+	public function testSrcMacro_default_withoutExtension()
+	{
+		$template = $this->renderTemplate(__DIR__. '/templates/src.defaultImage.withoutExtension.latte');
+
+		Assert::same('<img src="/images/dots/default.jpg">', $template);
+	}
+
+
 	public function testSrcMacro_without_default()
 	{
 		$template = $this->renderTemplate(__DIR__. '/templates/src.withoutDefaultImage.latte', function(ImagesManager $manager) {

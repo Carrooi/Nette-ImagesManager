@@ -77,10 +77,11 @@ class ImagesManagerTest extends TestCase
 	public function testLoad_withoutExtension_notExists()
 	{
 		$manager = new ImagesManager(new DefaultNameResolver, __DIR__. '/../www/images', '/');
+		$manager->setDefault(null);
 
 		Assert::exception(function() use ($manager) {
 			$manager->load('dots', 'red');
-		}, 'Carrooi\ImagesManager\InvalidArgumentException', 'Name must in "<name>.<extension>" format, "red" given.');
+		}, 'Carrooi\ImagesManager\ImageNotExistsException', 'Image "red" does not exists.');
 	}
 
 

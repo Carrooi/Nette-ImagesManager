@@ -448,6 +448,9 @@ All methods which returns images, returns `Carrooi\ImagesManager\Image` class.
 
 # Changelog
 
+* 2.0.1
+	+ Fixed error with loading images without extension and they don't exists
+
 * 2.0.0
 	+ Optimized tests
 	+ Optimized dependencies of all classes
