@@ -137,6 +137,7 @@ class ImagesManagerTest extends TestCase
 			'black.jpg',
 			'black.png',
 			'default.jpg',
+			'white.png',
 		));
 
 		sort($expect, SORT_STRING);

@@ -2,15 +2,3 @@ images:
 
 	basePath: %appDir%/../www/images
 	baseUrl: /images
-
-	namespaces:
-
-		colors:
-			resizeFlag: stretch
-			default: white.png
-			quality: 100
-
-			lists:
-				best:
-					- black.jpg
-					- pink.png

@@ -71,12 +71,12 @@ class NamespaceManagerTest extends TestCase
 	{
 		$manager = new ImagesManager(new DefaultNameResolver, '/var/www/images', '/');
 
-		$namespace = new NamespaceManager('colors', new DefaultNameResolver);
+		$namespace = new NamespaceManager('dots', new DefaultNameResolver);
 		$namespace->registerImagesManager($manager);
 
 		$namespace->addList('best', array(
 			'black.jpg',
-			'pink.png',
+			'white.png',
 		));
 
 		$list = $namespace->getList('best');
@@ -86,19 +86,19 @@ class NamespaceManagerTest extends TestCase
 		}, $list);
 
 		Assert::equal(array(
-			'colors/black.jpg',
-			'colors/pink.png',
+			'dots/black.jpg',
+			'dots/white.png',
 		), $images);
 	}
 
 
 	public function testGetList_not_exists()
 	{
-		$namespace = new NamespaceManager('colors', new DefaultNameResolver);
+		$namespace = new NamespaceManager('dots', new DefaultNameResolver);
 
 		Assert::exception(function() use ($namespace) {
 			$namespace->getList('unknown');
-		}, 'DK\ImagesManager\InvalidArgumentException', 'Images list "unknown" is not registered in "colors" namespace.');
+		}, 'DK\ImagesManager\InvalidArgumentException', 'Images list "unknown" is not registered in "dots" namespace.');
 	}
 
 }
