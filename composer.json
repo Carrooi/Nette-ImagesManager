@@ -1,5 +1,5 @@
 {
-	"name": "sakren/nette-images-manager",
+	"name": "carrooi/images-manager",
 	"type": "library",
 	"description": "Images manager for Nette framework",
 	"keywords": ["nette", "image", "manager", "storage", "source", "loader"],

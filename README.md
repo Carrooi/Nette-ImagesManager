@@ -8,7 +8,7 @@ Images-manager is a tool for managing all of your web images (well, except templ
 ## Installation
 
 ```
-$ composer require sakren/nette-images-manager
+$ composer require carrooi/images-manager
 $ composer update
 ```
 
