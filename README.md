@@ -146,6 +146,11 @@ This step also couldn't be easier, because there are some Latte macros registere
 <img n:src="users, 'david.jpg', 150, stretch">
 ```
 
+*absolute urls (works only at latte):*
+```html
+<img n:src="users, '//david.jpg'">
+```
+
 You can even use names without files' extensions and images-manager will try to find it for you:
 
 ```html

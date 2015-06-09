@@ -78,10 +78,16 @@ class Macros extends MacroSet
 		array_shift($args);
 
 		try {
+			$absolute = false;
+			if (strpos($args[1], '//') === 0) {
+				$absolute = true;
+				$args[1] = substr($args[1], 2);
+			}
+
 			/** @var \DK\ImagesManager\Image $image */
 			$image = call_user_func_array(array($imagesManager, 'load'), $args);
 
-			return $image->getUrl();
+			return $image->getUrl($absolute);
 		} catch (ImageNotExistsException $e) {}
 
 		return '';

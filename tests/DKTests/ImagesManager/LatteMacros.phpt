@@ -61,6 +61,14 @@ class LatteMacrosTest extends TestCase
 	}
 
 
+	public function testSrcMacro_absolute()
+	{
+		$template = $this->renderTemplate('macro.src.absolute');
+
+		Assert::same('<img src="http://localhost/images/base/dots/dots_black.png">', $template);
+	}
+
+
 	public function testSrcMacro_default()
 	{
 		$template = $this->renderTemplate('macro.src.default');
