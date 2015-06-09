@@ -9,11 +9,14 @@ nette:
 		mapping:
 			*: DKTests\*Module\Presenters\*Presenter
 
-	security:
-		frames: null
-
 	session:
 		autoStart: false
+
+
+images:
+
+	basePath: %appDir%/../www/images
+	baseUrl: /images
 
 
 services:

@@ -15,10 +15,6 @@ Tester\Environment::setup();
 class_alias('Tester\Assert', 'Assert');
 date_default_timezone_set('Europe/Prague');
 
-if (!class_exists('Nette\Bridges\ApplicationLatte\TemplateFactory')) {
-	
-}
-
 // create temporary directory
 define('TEMP_DIR', __DIR__ . '/../tmp/' . (isset($_SERVER['argv']) ? md5(serialize($_SERVER['argv'])) : getmypid()));
 Tester\Helpers::purge(TEMP_DIR);

@@ -46,7 +46,6 @@ class TestCase extends BaseTestCase
 			));
 
 			$config->addConfig(__DIR__. '/../app/config/config.neon');
-			$config->addConfig(__DIR__. '/../app/config/images.neon');
 
 			Extension::register($config);
 

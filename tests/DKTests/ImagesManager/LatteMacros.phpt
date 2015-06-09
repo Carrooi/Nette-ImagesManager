@@ -39,7 +39,7 @@ class LatteMacrosTest extends TestCase
 		$manager = $container->getByType('DK\ImagesManager\ImagesManager');
 
 		if (class_exists('Nette\Bridges\ApplicationLatte\TemplateFactory')) {
-			$factory = $container->getByType('Nette\Bridges\ApplicationLatte\TemplateFactory');		/** @var $factory \Nette\Bridges\ApplicationLatte\TemplateFactory */
+			$factory = $container->getByType('Nette\Application\UI\ITemplateFactory');		/** @var $factory \Nette\Application\UI\ITemplateFactory */
 			$template = $factory->createTemplate(new Control);
 		} else {
 			$template = new FileTemplate;
@@ -69,7 +69,9 @@ class LatteMacrosTest extends TestCase
 
 	public function testSrcMacro_absolute()
 	{
-		$template = $this->renderTemplate('<img n:src="dots, \'//black.png\'">');
+		$template = $this->renderTemplate('<img n:src="dots, \'//black.png\'">', function(ImagesManager $manager) {
+			$manager->setHost('http://localhost');
+		});
 
 		Assert::same('<img src="http://localhost/images/dots/black.png">', $template);
 	}
