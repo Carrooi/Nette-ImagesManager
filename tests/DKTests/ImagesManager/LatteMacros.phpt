@@ -11,7 +11,6 @@ namespace DKTests\ImagesManager;
 
 require_once __DIR__. '/../bootstrap.php';
 
-use DK\ImagesManager\DefaultNameResolver;
 use DK\ImagesManager\Image;
 use DK\ImagesManager\ImagesManager;
 use Nette\Templating\FileTemplate;
