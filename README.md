@@ -448,6 +448,17 @@ All methods which returns images, returns `Carrooi\ImagesManager\Image` class.
 
 # Changelog
 
+* 2.0.0
+	+ Optimized tests
+	+ Optimized dependencies of all classes
+	+ Removed dependency on whole nette/nette and requiring only needed packages
+	+ Require nette >= 2.2 (bc break)
+	+ Latte macros src and image can return absolute urls
+	+ Returning dummy images for thumbnails if no default image is found (uses [satyr.io](http://satyr.io/))
+	+ Change base namespace from `DK` to `Carrooi` (bc break)
+	+ Package and repository moved under Carrooi organization
+	+ Packageist package renamed from `sakren/nette-images-manager` to `carrooi/images-manager` (bc break)
+
 * 1.1.0
 	+ Some optimizations
 	* Upload method now uses quality from namespace configuration
