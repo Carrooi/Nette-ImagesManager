@@ -31,18 +31,18 @@ class LatteMacrosTest extends TestCase
 
 	/**
 	 * @param string $tmpl
+	 * @param callable $onBeforeRender
 	 * @return string
 	 */
-	private function renderTemplate($tmpl)
+	private function renderTemplate($tmpl, $onBeforeRender = null)
 	{
 		$container = $this->createContainer();
+		$manager = $container->getByType('DK\ImagesManager\ImagesManager');
 
 		if (class_exists('Nette\Bridges\ApplicationLatte\TemplateFactory')) {
 			$factory = $container->getByType('Nette\Bridges\ApplicationLatte\TemplateFactory');		/** @var $factory \Nette\Bridges\ApplicationLatte\TemplateFactory */
 			$template = $factory->createTemplate(new Control);
-
 		} else {
-			$manager = new ImagesManager(new DefaultNameResolver, '', '');
 			$template = new FileTemplate;
 			$engine = new Engine;
 
@@ -50,6 +50,10 @@ class LatteMacrosTest extends TestCase
 			$template->registerFilter($engine);
 
 			Macros::install($engine->getCompiler());
+		}
+
+		if ($onBeforeRender) {
+			$onBeforeRender($manager);
 		}
 
 		return trim($template->setFile(FileMock::create($tmpl, 'latte')));
@@ -82,7 +86,9 @@ class LatteMacrosTest extends TestCase
 
 	public function testSrcMacro_without_default()
 	{
-		$template = $this->renderTemplate('<img n:src="blackness, \'green.png\'">');
+		$template = $this->renderTemplate('<img n:src="dots, \'green.png\'">', function(ImagesManager $manager) {
+			$manager->setDefault(null);
+		});
 
 		Assert::same('<img src="">', $template);
 	}

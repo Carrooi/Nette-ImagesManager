@@ -47,9 +47,10 @@ class ImagesManagerTest extends TestCase
 	public function testLoad_not_exists()
 	{
 		$manager = new ImagesManager(new DefaultNameResolver, __DIR__. '/../www/images', '/');
+		$manager->setDefault(null);
 
 		Assert::exception(function() use ($manager) {
-			$manager->load('blackness', 'pink.jpg');
+			$manager->load('dots', 'pink.jpg');
 		}, 'DK\ImagesManager\ImageNotExistsException', 'Image "pink.jpg" does not exists.');
 	}
 
