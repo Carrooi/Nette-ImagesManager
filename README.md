@@ -1,5 +1,5 @@
-[![Build Status](https://travis-ci.org/sakren/nette-images-manager.png?branch=master)](https://travis-ci.org/sakren/nette-images-manager)
-[![Donate](http://b.repl.ca/v1/donate-PayPal-brightgreen.png)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=39WBDGLHF48PE)
+[![Build Status](https://img.shields.io/travis/sakren/nette-images-manager.svg?style=flat-square)](https://travis-ci.org/sakren/nette-images-manager)
+[![Donate](https://img.shields.io/badge/donate-PayPal-brightgreen.svg?style=flat-square)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=39WBDGLHF48PE)
 
 # Images manager
 
