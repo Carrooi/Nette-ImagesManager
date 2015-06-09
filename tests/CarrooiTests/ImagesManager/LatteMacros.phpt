@@ -1,23 +1,23 @@
 <?php
 
 /**
- * Test: DK\ImagesManager\Latte\Macros
+ * Test: Carrooi\ImagesManager\Latte\Macros
  *
- * @testCase DKTests\ImagesManager\Latte\Macros
+ * @testCase CarrooiTests\ImagesManager\Latte\Macros
  * @author David Kudera
  */
 
-namespace DKTests\ImagesManager;
+namespace CarrooiTests\ImagesManager;
 
 require_once __DIR__. '/../bootstrap.php';
 
-use DK\ImagesManager\Image;
-use DK\ImagesManager\ImagesManager;
+use Carrooi\ImagesManager\Image;
+use Carrooi\ImagesManager\ImagesManager;
 use Nette\Templating\FileTemplate;
 use Nette\Latte\Engine;
 use Tester\Assert;
-use DKTests\Mocks\Control;
-use DK\ImagesManager\Latte\Macros;
+use CarrooiTests\Mocks\Control;
+use Carrooi\ImagesManager\Latte\Macros;
 
 /**
  *
@@ -35,7 +35,7 @@ class LatteMacrosTest extends TestCase
 	private function renderTemplate($path, $onBeforeRender = null)
 	{
 		$container = $this->createContainer();
-		$manager = $container->getByType('DK\ImagesManager\ImagesManager');
+		$manager = $container->getByType('Carrooi\ImagesManager\ImagesManager');
 
 		if (class_exists('Nette\Bridges\ApplicationLatte\TemplateFactory')) {
 			$factory = $container->getByType('Nette\Application\UI\ITemplateFactory');		/** @var $factory \Nette\Application\UI\ITemplateFactory */

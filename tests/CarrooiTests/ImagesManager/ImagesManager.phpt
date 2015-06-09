@@ -1,22 +1,22 @@
 <?php
 
 /**
- * Test: DK\ImagesManager\ImagesManager
+ * Test: Carrooi\ImagesManager\ImagesManager
  *
- * @testCase DKTests\ImagesManager\ImagesManagerTest
+ * @testCase CarrooiTests\ImagesManager\ImagesManagerTest
  * @author David Kudera
  */
 
-namespace DKTests\ImagesManager;
+namespace CarrooiTests\ImagesManager;
 
 require_once __DIR__. '/../bootstrap.php';
 
-use DK\ImagesManager\DefaultNameResolver;
-use DK\ImagesManager\ImagesManager;
+use Carrooi\ImagesManager\DefaultNameResolver;
+use Carrooi\ImagesManager\ImagesManager;
 use Tester\Assert;
 use Nette\Utils\Image as NetteImage;
-use DK\ImagesManager\INameResolver;
-use DK\ImagesManager\Image;
+use Carrooi\ImagesManager\INameResolver;
+use Carrooi\ImagesManager\Image;
 
 /**
  *
@@ -51,7 +51,7 @@ class ImagesManagerTest extends TestCase
 
 		Assert::exception(function() use ($manager) {
 			$manager->load('dots', 'pink.jpg');
-		}, 'DK\ImagesManager\ImageNotExistsException', 'Image "pink.jpg" does not exists.');
+		}, 'Carrooi\ImagesManager\ImageNotExistsException', 'Image "pink.jpg" does not exists.');
 	}
 
 
@@ -61,7 +61,7 @@ class ImagesManagerTest extends TestCase
 
 		Assert::exception(function() use ($manager) {
 			$manager->load('dots', 'pink.jpg', null, null, false);
-		}, 'DK\ImagesManager\ImageNotExistsException', 'Image "pink.jpg" does not exists.');
+		}, 'Carrooi\ImagesManager\ImageNotExistsException', 'Image "pink.jpg" does not exists.');
 	}
 
 
@@ -80,7 +80,7 @@ class ImagesManagerTest extends TestCase
 
 		Assert::exception(function() use ($manager) {
 			$manager->load('dots', 'red');
-		}, 'DK\ImagesManager\InvalidArgumentException', 'Name must in "<name>.<extension>" format, "red" given.');
+		}, 'Carrooi\ImagesManager\InvalidArgumentException', 'Name must in "<name>.<extension>" format, "red" given.');
 	}
 
 
@@ -255,13 +255,13 @@ class ImagesManagerTest extends TestCase
 			$manager->load('dots', 'newBlack.jpg', 5),
 		);
 
-		foreach ($thumbnails as $thumbnail) {		/** @var $thumbnail \DK\ImagesManager\Image */
+		foreach ($thumbnails as $thumbnail) {		/** @var $thumbnail \Carrooi\ImagesManager\Image */
 			Assert::true($thumbnail->isExists());
 		}
 
 		$manager->removeThumbnails($imageSource);
 
-		foreach ($thumbnails as $thumbnail) {		/** @var $thumbnail \DK\ImagesManager\Image */
+		foreach ($thumbnails as $thumbnail) {		/** @var $thumbnail \Carrooi\ImagesManager\Image */
 			Assert::false($thumbnail->isExists());
 		}
 

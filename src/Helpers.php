@@ -1,6 +1,6 @@
 <?php
 
-namespace DK\ImagesManager;
+namespace Carrooi\ImagesManager;
 
 use Nette\Object;
 use Nette\Utils\Strings;
@@ -27,7 +27,7 @@ class Helpers extends Object
 	/**
 	 * @param string $name
 	 * @return object
-	 * @throws \DK\ImagesManager\InvalidArgumentException
+	 * @throws \Carrooi\ImagesManager\InvalidArgumentException
 	 */
 	public static function parseName($name)
 	{
@@ -60,7 +60,7 @@ class Helpers extends Object
 	/**
 	 * @param int|string $size
 	 * @return object
-	 * @throws \DK\ImagesManager\InvalidArgumentException
+	 * @throws \Carrooi\ImagesManager\InvalidArgumentException
 	 */
 	public static function parseSize($size)
 	{
@@ -146,7 +146,7 @@ class Helpers extends Object
 
 	/**
 	 * @param string $s
-	 * @param \DK\ImagesManager\Image $image
+	 * @param \Carrooi\ImagesManager\Image $image
 	 * @param bool $thumbnailData
 	 * @return string
 	 */
@@ -164,7 +164,7 @@ class Helpers extends Object
 	/**
 	 * @param string $flag
 	 * @return int
-	 * @throws \DK\ImagesManager\InvalidArgumentException
+	 * @throws \Carrooi\ImagesManager\InvalidArgumentException
 	 */
 	public static function getNetteResizeFlag($flag)
 	{

@@ -1,6 +1,6 @@
 <?php
 
-namespace DK\ImagesManager;
+namespace Carrooi\ImagesManager;
 
 use Nette\Caching\Cache;
 use Nette\Caching\IStorage;
@@ -9,7 +9,7 @@ use Nette\Object;
 use Nette\Utils\Image as NetteImage;
 use Nette\Utils\Strings;
 use Nette\Utils\Finder;
-use DK\ImagesManager\Latte\Helpers as TemplateHelpers;
+use Carrooi\ImagesManager\Latte\Helpers as TemplateHelpers;
 
 /**
  *
@@ -19,7 +19,7 @@ class ImagesManager extends Object
 {
 
 
-	const CACHE_NAMESPACE = 'DK.ImagesManager';
+	const CACHE_NAMESPACE = 'Carrooi.ImagesManager';
 
 	const DEFAULT_IMAGES_MASK = '<namespace><separator><name>.<extension>';
 
@@ -32,7 +32,7 @@ class ImagesManager extends Object
 	const DEFAULT_QUALITY = 90;
 
 
-	/** @var \DK\ImagesManager\INameResolver */
+	/** @var \Carrooi\ImagesManager\INameResolver */
 	private $nameResolver;
 
 	/** @var \Nette\Caching\Cache */
@@ -65,12 +65,12 @@ class ImagesManager extends Object
 	/** @var int */
 	private $quality = self::DEFAULT_QUALITY;
 
-	/** @var \DK\ImagesManager\NamespaceManager[] */
+	/** @var \Carrooi\ImagesManager\NamespaceManager[] */
 	private $namespaces = array();
 
 
 	/**
-	 * @param \DK\ImagesManager\INameResolver $nameResolver
+	 * @param \Carrooi\ImagesManager\INameResolver $nameResolver
 	 * @param string $basePath
 	 * @param string $baseUrl
 	 */
@@ -270,8 +270,8 @@ class ImagesManager extends Object
 
 	/**
 	 * @param string $name
-	 * @param \DK\ImagesManager\NamespaceManager $namespaceManager
-	 * @return \DK\ImagesManager\ImagesManager
+	 * @param \Carrooi\ImagesManager\NamespaceManager $namespaceManager
+	 * @return \Carrooi\ImagesManager\ImagesManager
 	 */
 	public function addNamespace($name, NamespaceManager $namespaceManager)
 	{
@@ -296,7 +296,7 @@ class ImagesManager extends Object
 
 	/**
 	 * @param string $name
-	 * @return \DK\ImagesManager\NamespaceManager
+	 * @return \Carrooi\ImagesManager\NamespaceManager
 	 */
 	public function getNamespace($name)
 	{
@@ -316,7 +316,7 @@ class ImagesManager extends Object
 
 	/**
 	 * @param string $namespace
-	 * @return \DK\ImagesManager\Image[]
+	 * @return \Carrooi\ImagesManager\Image[]
 	 */
 	public function findImages($namespace)
 	{
@@ -356,8 +356,8 @@ class ImagesManager extends Object
 
 
 	/**
-	 * @param \DK\ImagesManager\Image $image
-	 * @return \DK\ImagesManager\Image[]
+	 * @param \Carrooi\ImagesManager\Image $image
+	 * @return \Carrooi\ImagesManager\Image[]
 	 */
 	public function findThumbnails(Image $image)
 	{
@@ -393,8 +393,8 @@ class ImagesManager extends Object
 	 * @param string $resizeFlag
 	 * @param string $default
 	 * @param int $quality
-	 * @return \DK\ImagesManager\Image
-	 * @throws \DK\ImagesManager\ImageNotExistsException
+	 * @return \Carrooi\ImagesManager\Image
+	 * @throws \Carrooi\ImagesManager\ImageNotExistsException
 	 */
 	public function load($namespace, $name, $size = null, $resizeFlag = null, $default = null, $quality = null)
 	{
@@ -441,7 +441,7 @@ class ImagesManager extends Object
 	/**
 	 * @param string $namespace
 	 * @param mixed $name
-	 * @return \DK\ImagesManager\Image
+	 * @return \Carrooi\ImagesManager\Image
 	 */
 	public function createImage($namespace, $name)
 	{
@@ -517,7 +517,7 @@ class ImagesManager extends Object
 	 * @param string $namespace
 	 * @param mixed $name
 	 * @param int $quality
-	 * @return \DK\ImagesManager\Image
+	 * @return \Carrooi\ImagesManager\Image
 	 */
 	public function upload(NetteImage $image, $namespace, $name, $quality = null)
 	{
@@ -537,7 +537,7 @@ class ImagesManager extends Object
 
 
 	/**
-	 * @param \DK\ImagesManager\Image $image
+	 * @param \Carrooi\ImagesManager\Image $image
 	 */
 	public function removeImage(Image $image)
 	{
@@ -556,7 +556,7 @@ class ImagesManager extends Object
 
 
 	/**
-	 * @param \DK\ImagesManager\Image $image
+	 * @param \Carrooi\ImagesManager\Image $image
 	 */
 	public function removeThumbnails(Image $image)
 	{
@@ -568,7 +568,7 @@ class ImagesManager extends Object
 
 	/**
 	 * @internal
-	 * @return \DK\ImagesManager\Latte\Helpers
+	 * @return \Carrooi\ImagesManager\Latte\Helpers
 	 */
 	public function createTemplateHelpers()
 	{

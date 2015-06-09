@@ -1,6 +1,6 @@
 <?php
 
-namespace DK\ImagesManager;
+namespace Carrooi\ImagesManager;
 
 use Nette\Object;
 
@@ -15,10 +15,10 @@ class NamespaceManager extends Object
 	/** @var string */
 	private $name;
 
-	/** @var \DK\ImagesManager\ImagesManager */
+	/** @var \Carrooi\ImagesManager\ImagesManager */
 	private $imagesManager;
 
-	/** @var \DK\ImagesManager\INameResolver */
+	/** @var \Carrooi\ImagesManager\INameResolver */
 	private $nameResolver;
 
 	/** @var string|array */
@@ -36,7 +36,7 @@ class NamespaceManager extends Object
 
 	/**
 	 * @param string $name
-	 * @param \DK\ImagesManager\INameResolver $nameResolver
+	 * @param \Carrooi\ImagesManager\INameResolver $nameResolver
 	 */
 	public function __construct($name, INameResolver $nameResolver)
 	{
@@ -55,7 +55,7 @@ class NamespaceManager extends Object
 
 
 	/**
-	 * @return \DK\ImagesManager\INameResolver
+	 * @return \Carrooi\ImagesManager\INameResolver
 	 */
 	public function getNameResolver()
 	{
@@ -64,8 +64,8 @@ class NamespaceManager extends Object
 
 
 	/**
-	 * @param \DK\ImagesManager\INameResolver $nameResolver
-	 * @return \DK\ImagesManager\NamespaceManager
+	 * @param \Carrooi\ImagesManager\INameResolver $nameResolver
+	 * @return \Carrooi\ImagesManager\NamespaceManager
 	 */
 	public function setNameResolver(INameResolver $nameResolver)
 	{
@@ -76,8 +76,8 @@ class NamespaceManager extends Object
 
 	/**
 	 * @internal
-	 * @param \DK\ImagesManager\ImagesManager $imagesManager
-	 * @return \DK\ImagesManager\NamespaceManager
+	 * @param \Carrooi\ImagesManager\ImagesManager $imagesManager
+	 * @return \Carrooi\ImagesManager\NamespaceManager
 	 */
 	public function registerImagesManager(ImagesManager $imagesManager)
 	{
@@ -97,7 +97,7 @@ class NamespaceManager extends Object
 
 	/**
 	 * @param string|array $default
-	 * @return \DK\ImagesManager\NamespaceManager
+	 * @return \Carrooi\ImagesManager\NamespaceManager
 	 */
 	public function setDefault($default)
 	{
@@ -117,7 +117,7 @@ class NamespaceManager extends Object
 
 	/**
 	 * @param string $resizeFlag
-	 * @return \DK\ImagesManager\NamespaceManager
+	 * @return \Carrooi\ImagesManager\NamespaceManager
 	 */
 	public function setResizeFlag($resizeFlag)
 	{
@@ -137,7 +137,7 @@ class NamespaceManager extends Object
 
 	/**
 	 * @param int $quality
-	 * @return \DK\ImagesManager\NamespaceManager
+	 * @return \Carrooi\ImagesManager\NamespaceManager
 	 */
 	public function setQuality($quality)
 	{
@@ -149,7 +149,7 @@ class NamespaceManager extends Object
 	/**
 	 * @param string $name
 	 * @param array $images
-	 * @return \DK\ImagesManager\NamespaceManager
+	 * @return \Carrooi\ImagesManager\NamespaceManager
 	 */
 	public function addList($name, array $images)
 	{
@@ -164,8 +164,8 @@ class NamespaceManager extends Object
 
 	/**
 	 * @param string $name
-	 * @return \DK\ImagesManager\Image[]
-	 * @throws \DK\ImagesManager\InvalidArgumentException
+	 * @return \Carrooi\ImagesManager\Image[]
+	 * @throws \Carrooi\ImagesManager\InvalidArgumentException
 	 */
 	public function getList($name)
 	{

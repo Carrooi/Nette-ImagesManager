@@ -1,6 +1,6 @@
 <?php
 
-namespace DK\ImagesManager;
+namespace Carrooi\ImagesManager;
 
 /**
  *

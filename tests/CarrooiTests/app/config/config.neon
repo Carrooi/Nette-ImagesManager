@@ -7,7 +7,7 @@ nette:
 
 	application:
 		mapping:
-			*: DKTests\*Module\Presenters\*Presenter
+			*: CarrooiTests\*Module\Presenters\*Presenter
 
 	session:
 		autoStart: false
@@ -31,4 +31,4 @@ services:
 			- '$service[] = ?'(Nette\Application\Routers\Route('<presenter>/<action>[/<id>]', 'Homepage:default'))
 
 	nette.httpRequestFactory:
-		class: DKTests\Mocks\HttpRequestFactory
+		class: CarrooiTests\Mocks\HttpRequestFactory

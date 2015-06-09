@@ -1,11 +1,11 @@
 <?php
 
-namespace DKTests\ImagesManager;
+namespace CarrooiTests\ImagesManager;
 
 use Nette\Configurator;
 use Tester\Environment;
 use Tester\TestCase as BaseTestCase;
-use DK\ImagesManager\DI\Extension;
+use Carrooi\ImagesManager\DI\Extension;
 
 /**
  *

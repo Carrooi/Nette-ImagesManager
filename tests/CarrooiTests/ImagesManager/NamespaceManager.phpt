@@ -1,21 +1,21 @@
 <?php
 
 /**
- * Test: DK\ImagesManager\NamespaceManager
+ * Test: Carrooi\ImagesManager\NamespaceManager
  *
- * @testCase DKTests\ImagesManager\NamespaceManagerTest
+ * @testCase CarrooiTests\ImagesManager\NamespaceManagerTest
  * @author David Kudera
  */
 
-namespace DKTests\ImagesManager;
+namespace CarrooiTests\ImagesManager;
 
 require_once __DIR__. '/../bootstrap.php';
 
-use DK\ImagesManager\DefaultNameResolver;
-use DK\ImagesManager\ImagesManager;
-use DK\ImagesManager\NamespaceManager;
+use Carrooi\ImagesManager\DefaultNameResolver;
+use Carrooi\ImagesManager\ImagesManager;
+use Carrooi\ImagesManager\NamespaceManager;
 use Tester\Assert;
-use DK\ImagesManager\Image;
+use Carrooi\ImagesManager\Image;
 
 /**
  *
@@ -98,7 +98,7 @@ class NamespaceManagerTest extends TestCase
 
 		Assert::exception(function() use ($namespace) {
 			$namespace->getList('unknown');
-		}, 'DK\ImagesManager\InvalidArgumentException', 'Images list "unknown" is not registered in "dots" namespace.');
+		}, 'Carrooi\ImagesManager\InvalidArgumentException', 'Images list "unknown" is not registered in "dots" namespace.');
 	}
 
 }

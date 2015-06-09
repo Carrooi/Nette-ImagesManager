@@ -1,17 +1,17 @@
 <?php
 
 /**
- * Test: DK\ImagesManager\Image
+ * Test: Carrooi\ImagesManager\Image
  *
- * @testCase DKTests\ImagesManager\ImageTest
+ * @testCase CarrooiTests\ImagesManager\ImageTest
  * @author David Kudera
  */
 
-namespace DKTests\ImagesManager;
+namespace CarrooiTests\ImagesManager;
 
 require_once __DIR__. '/../bootstrap.php';
 
-use DK\ImagesManager\Image;
+use Carrooi\ImagesManager\Image;
 use Tester\Assert;
 
 /**
@@ -142,7 +142,7 @@ class ImageTest extends TestCase
 
 		Assert::exception(function() use ($image) {
 			$image->tryCreateThumbnail();
-		}, 'DK\ImagesManager\InvalidStateException', 'Can not create thumbnail for "black.jpg" image when size is not provided.');
+		}, 'Carrooi\ImagesManager\InvalidStateException', 'Can not create thumbnail for "black.jpg" image when size is not provided.');
 	}
 
 }

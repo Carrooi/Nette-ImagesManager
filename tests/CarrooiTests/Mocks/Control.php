@@ -1,6 +1,6 @@
 <?php
 
-namespace DKTests\Mocks;
+namespace CarrooiTests\Mocks;
 
 use Nette\Application\UI\Control as BaseControl;
 

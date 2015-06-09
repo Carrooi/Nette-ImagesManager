@@ -1,10 +1,10 @@
 <?php
 
-namespace DK\ImagesManager\Latte;
+namespace Carrooi\ImagesManager\Latte;
 
 use Nette\Object;
 use Latte\Engine;
-use DK\ImagesManager\ImagesManager;
+use Carrooi\ImagesManager\ImagesManager;
 
 /**
  *
@@ -14,12 +14,12 @@ class Helpers extends Object
 {
 
 
-	/** @var \DK\ImagesManager\ImagesManager  */
+	/** @var \Carrooi\ImagesManager\ImagesManager  */
 	private $imagesManager;
 
 
 	/**
-	 * @param \DK\ImagesManager\ImagesManager $imagesManager
+	 * @param \Carrooi\ImagesManager\ImagesManager $imagesManager
 	 */
 	public function __construct(ImagesManager $imagesManager)
 	{
@@ -52,7 +52,7 @@ class Helpers extends Object
 
 
 	/**
-	 * @return \DK\ImagesManager\ImagesManager
+	 * @return \Carrooi\ImagesManager\ImagesManager
 	 */
 	public function getImagesManager()
 	{

@@ -1,19 +1,19 @@
 <?php
 
 /**
- * Test: DK\ImagesManager\Helpers
+ * Test: Carrooi\ImagesManager\Helpers
  *
- * @testCase DKTests\ImagesManager\Helpers
+ * @testCase CarrooiTests\ImagesManager\Helpers
  * @author David Kudera
  */
 
-namespace DKTests\ImagesManager;
+namespace CarrooiTests\ImagesManager;
 
 require_once __DIR__. '/../bootstrap.php';
 
 use Tester\TestCase;
 use Tester\Assert;
-use DK\ImagesManager\Helpers;
+use Carrooi\ImagesManager\Helpers;
 
 /**
  *
@@ -46,7 +46,7 @@ class HelpersTest extends TestCase
 	{
 		Assert::exception(function() {
 			Helpers::parseName('car_my_jpg');
-		}, 'DK\ImagesManager\InvalidArgumentException', 'Name must in "<name>.<extension>" format, "car_my_jpg" given.');
+		}, 'Carrooi\ImagesManager\InvalidArgumentException', 'Name must in "<name>.<extension>" format, "car_my_jpg" given.');
 	}
 
 
@@ -54,7 +54,7 @@ class HelpersTest extends TestCase
 	{
 		Assert::exception(function() {
 			Helpers::parseName('car_my.jpg');
-		}, 'DK\ImagesManager\InvalidArgumentException', 'Name must in "<name>.<extension>" format, where <name> must be alphanumerical. "car_my.jpg" given.');
+		}, 'Carrooi\ImagesManager\InvalidArgumentException', 'Name must in "<name>.<extension>" format, where <name> must be alphanumerical. "car_my.jpg" given.');
 	}
 
 
@@ -62,7 +62,7 @@ class HelpersTest extends TestCase
 	{
 		Assert::exception(function() {
 			Helpers::parseName(new \stdClass);
-		}, 'DK\ImagesManager\InvalidArgumentException', 'Name must be a string, object given.');
+		}, 'Carrooi\ImagesManager\InvalidArgumentException', 'Name must be a string, object given.');
 	}
 
 
@@ -92,7 +92,7 @@ class HelpersTest extends TestCase
 	{
 		Assert::exception(function() {
 			Helpers::parseSize(new \stdClass);
-		}, 'DK\ImagesManager\InvalidArgumentException', 'Size must be a string or an integer, object given.');
+		}, 'Carrooi\ImagesManager\InvalidArgumentException', 'Size must be a string or an integer, object given.');
 	}
 
 
@@ -100,7 +100,7 @@ class HelpersTest extends TestCase
 	{
 		Assert::exception(function() {
 			Helpers::parseSize('test string');
-		}, 'DK\ImagesManager\InvalidArgumentException', 'Size must be in "<width>x<height>" format.');
+		}, 'Carrooi\ImagesManager\InvalidArgumentException', 'Size must be in "<width>x<height>" format.');
 	}
 
 

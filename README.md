@@ -17,7 +17,7 @@ now you can register extension and prepare new config file for images-manager.
 *config.neon:*
 ```
 extensions:
-	images: DK\ImagesManager\DI\Extension
+	images: Carrooi\ImagesManager\DI\Extension
 	
 includes:
 	- ./images.neon
@@ -52,7 +52,7 @@ namespace App\Presenters;
 use Nette\Application\UI\Presenter;
 use Nette\Application\UI\Form;
 use Nette\Utils\ArrayHash;
-use DK\ImagesManager\ImagesManager;
+use Carrooi\ImagesManager\ImagesManager;
 
 /**
  *
@@ -62,12 +62,12 @@ class ImagesPresenter extends Presenter
 {
 
 
-	/** @var \DK\ImagesManager\ImagesManager */
+	/** @var \Carrooi\ImagesManager\ImagesManager */
 	private $imagesManager;
 	
 	
 	/**
-	 * @param \DK\ImagesManager\ImagesManager $imagesManager
+	 * @param \Carrooi\ImagesManager\ImagesManager $imagesManager
 	 */
 	public function __construct(ImagesManager $imagesManager)
 	{
@@ -259,7 +259,7 @@ register custom name resolver.
 ```php
 namespace App\Images;
 
-use DK\ImagesManager\INameResolver;
+use Carrooi\ImagesManager\INameResolver;
 use App\Model\Entities\User;
 use Exception;
 
@@ -360,7 +360,7 @@ $thumbnails = $imagesManager->findThumbnails($image);
 ```
 images:
 
-	nameResolver: DK\ImagesManager\DefaultNameResolver
+	nameResolver: Carrooi\ImagesManager\DefaultNameResolver
 	cacheStorage: @cacheStorage
 	resizeFlag: fit
 	default: default.jpg
@@ -411,9 +411,9 @@ images:
 			default: <list|avatars>
 ```
 
-# DK\ImagesManager\Image
+# Carrooi\ImagesManager\Image
 
-All methods which returns images, returns `DK\ImagesManager\Image` class.
+All methods which returns images, returns `Carrooi\ImagesManager\Image` class.
 
 **Methods:**
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace DK\ImagesManager;
+namespace Carrooi\ImagesManager;
 
 /**
  *
@@ -13,7 +13,7 @@ interface IImageFactory
 	/**
 	 * @param string $namespace
 	 * @param string $name
-	 * @return \DK\ImagesManager\Image
+	 * @return \Carrooi\ImagesManager\Image
 	 */
 	public function create($namespace, $name);
 

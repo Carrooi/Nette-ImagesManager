@@ -1,6 +1,6 @@
 <?php
 
-namespace DKTests\Presenters;
+namespace CarrooiTests\Presenters;
 
 use Nette\Application\UI\Presenter;
 

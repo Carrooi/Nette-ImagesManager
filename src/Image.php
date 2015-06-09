@@ -1,6 +1,6 @@
 <?php
 
-namespace DK\ImagesManager;
+namespace Carrooi\ImagesManager;
 
 use Nette\Object;
 use Nette\Utils\Image as NetteImage;
@@ -84,7 +84,7 @@ class Image extends Object
 
 	/**
 	 * @param string $name
-	 * @return \DK\ImagesManager\Image
+	 * @return \Carrooi\ImagesManager\Image
 	 */
 	public function setName($name)
 	{
@@ -116,7 +116,7 @@ class Image extends Object
 
 	/**
 	 * @param string|int $size
-	 * @return \DK\ImagesManager\Image
+	 * @return \Carrooi\ImagesManager\Image
 	 */
 	public function setSize($size)
 	{
@@ -139,7 +139,7 @@ class Image extends Object
 
 	/**
 	 * @param int $width
-	 * @return \DK\ImagesManager\Image
+	 * @return \Carrooi\ImagesManager\Image
 	 */
 	public function setWidth($width)
 	{
@@ -168,7 +168,7 @@ class Image extends Object
 
 	/**
 	 * @param int $height
-	 * @return \DK\ImagesManager\Image
+	 * @return \Carrooi\ImagesManager\Image
 	 */
 	public function setHeight($height)
 	{
@@ -188,7 +188,7 @@ class Image extends Object
 
 	/**
 	 * @param string $flag
-	 * @return \DK\ImagesManager\Image
+	 * @return \Carrooi\ImagesManager\Image
 	 */
 	public function setResizeFlag($flag)
 	{
@@ -228,7 +228,7 @@ class Image extends Object
 
 	/**
 	 * @param string $path
-	 * @return \DK\ImagesManager\Image
+	 * @return \Carrooi\ImagesManager\Image
 	 */
 	public function setBasePath($path)
 	{
@@ -248,7 +248,7 @@ class Image extends Object
 
 	/**
 	 * @param string $url
-	 * @return \DK\ImagesManager\Image
+	 * @return \Carrooi\ImagesManager\Image
 	 */
 	public function setBaseUrl($url)
 	{
@@ -268,7 +268,7 @@ class Image extends Object
 
 	/**
 	 * @param string $mask
-	 * @return \DK\ImagesManager\Image
+	 * @return \Carrooi\ImagesManager\Image
 	 */
 	public function setImagesMask($mask)
 	{
@@ -288,7 +288,7 @@ class Image extends Object
 
 	/**
 	 * @param string $mask
-	 * @return \DK\ImagesManager\Image
+	 * @return \Carrooi\ImagesManager\Image
 	 */
 	public function setThumbnailsMask($mask)
 	{
@@ -368,8 +368,8 @@ class Image extends Object
 
 	/**
 	 * @param int $quality
-	 * @return \DK\ImagesManager\Image
-	 * @throws \DK\ImagesManager\InvalidStateException
+	 * @return \Carrooi\ImagesManager\Image
+	 * @throws \Carrooi\ImagesManager\InvalidStateException
 	 */
 	public function tryCreateThumbnail($quality = null)
 	{

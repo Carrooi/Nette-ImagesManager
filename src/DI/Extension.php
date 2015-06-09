@@ -1,13 +1,13 @@
 <?php
 
-namespace DK\ImagesManager\DI;
+namespace Carrooi\ImagesManager\DI;
 
 use Nette\DI\CompilerExtension;
 use Nette\Configurator;
 use Nette\DI\Compiler;
 use Nette\DI\Statement;
 use Nette\Utils\Strings;
-use DK\ImagesManager\InvalidStateException;
+use Carrooi\ImagesManager\InvalidStateException;
 
 if (!class_exists('Latte\Compiler')) {
 	class_alias('Nette\Latte\Macros\MacroSet', 'Latte\Macros\MacroSet');
@@ -27,7 +27,7 @@ class Extension extends CompilerExtension
 
 	/** @var array */
 	private $defaults = array(
-		'nameResolver' => 'DK\ImagesManager\DefaultNameResolver',
+		'nameResolver' => 'Carrooi\ImagesManager\DefaultNameResolver',
 		'resizeFlag' => null,
 		'default' => null,
 		'quality' => null,
@@ -48,7 +48,7 @@ class Extension extends CompilerExtension
 		$builder = $this->getContainerBuilder();
 
 		$manager = $builder->addDefinition($this->prefix('manager'))
-			->setClass('DK\ImagesManager\ImagesManager', array(
+			->setClass('Carrooi\ImagesManager\ImagesManager', array(
 				new Statement($config['nameResolver']),
 				$config['basePath'],
 				$config['baseUrl'],
@@ -84,7 +84,7 @@ class Extension extends CompilerExtension
 			$nameResolver = isset($definition['nameResolver']) ? $definition['nameResolver'] : $config['nameResolver'];
 
 			$namespace = $builder->addDefinition($this->prefix("namespace.$name"))
-				->setClass('DK\ImagesManager\NamespaceManager', array($name, new Statement($nameResolver)))
+				->setClass('Carrooi\ImagesManager\NamespaceManager', array($name, new Statement($nameResolver)))
 				->setAutowired(false)
 				->addSetup('setQuality', array(isset($definition['quality']) ? $definition['quality'] : $config['quality']));
 
@@ -119,7 +119,7 @@ class Extension extends CompilerExtension
 		}
 
 		$builder->addDefinition($this->prefix('helpers'))
-			->setClass('DK\ImagesManager\Latte\Helpers')
+			->setClass('Carrooi\ImagesManager\Latte\Helpers')
 			->setFactory($this->prefix('@manager'). '::createTemplateHelpers')
 			->setInject(false);
 
@@ -128,7 +128,7 @@ class Extension extends CompilerExtension
 			: $builder->getDefinition('nette.latte');
 
 		$latteFactory
-			->addSetup('DK\ImagesManager\Latte\Macros::install(?->getCompiler())', array('@self'))
+			->addSetup('Carrooi\ImagesManager\Latte\Macros::install(?->getCompiler())', array('@self'))
 			->addSetup('addFilter', array('getImagesManager', array($this->prefix('@helpers'), 'getImagesManager')));
 	}
 

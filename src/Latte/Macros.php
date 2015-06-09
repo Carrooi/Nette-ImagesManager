@@ -1,10 +1,10 @@
 <?php
 
-namespace DK\ImagesManager\Latte;
+namespace Carrooi\ImagesManager\Latte;
 
-use DK\ImagesManager\Helpers as ImagesHelpers;
-use DK\ImagesManager\ImageNotExistsException;
-use DK\ImagesManager\ImagesManager;
+use Carrooi\ImagesManager\Helpers as ImagesHelpers;
+use Carrooi\ImagesManager\ImageNotExistsException;
+use Carrooi\ImagesManager\ImagesManager;
 use Latte\Macros\MacroSet;
 use Latte\Compiler;
 use Latte\MacroNode;
@@ -23,7 +23,7 @@ class Macros extends MacroSet
 	 */
 	public static function install(Compiler $compiler)
 	{
-		$me = new static($compiler);		/** @var $me \DK\ImagesManager\Latte\Macros */
+		$me = new static($compiler);		/** @var $me \Carrooi\ImagesManager\Latte\Macros */
 
 		$me->addMacro('image', array($me, 'macroImage'));
 		$me->addMacro('src', null, null, array($me, 'macroSrc'));
@@ -40,7 +40,7 @@ class Macros extends MacroSet
 	 */
 	public function macroImage(MacroNode $node, PhpWriter $writer)
 	{
-		return $writer->write("echo \\DK\\ImagesManager\\Latte\\Macros::getUrl(\$template->getImagesManager(), %node.args);");
+		return $writer->write("echo \\Carrooi\\ImagesManager\\Latte\\Macros::getUrl(\$template->getImagesManager(), %node.args);");
 	}
 
 
@@ -51,7 +51,7 @@ class Macros extends MacroSet
 	 */
 	public function macroSrc(MacroNode $node, PhpWriter $writer)
 	{
-		return $writer->write("echo ' src=\"'. \\DK\\ImagesManager\\Latte\\Macros::getUrl(\$template->getImagesManager(), %node.args). '\"';");
+		return $writer->write("echo ' src=\"'. \\Carrooi\\ImagesManager\\Latte\\Macros::getUrl(\$template->getImagesManager(), %node.args). '\"';");
 	}
 
 
@@ -70,7 +70,7 @@ class Macros extends MacroSet
 
 
 	/**
-	 * @param \DK\ImagesManager\ImagesManager $imagesManager
+	 * @param \Carrooi\ImagesManager\ImagesManager $imagesManager
 	 * @return string
 	 */
 	public static function getUrl(ImagesManager $imagesManager)
@@ -85,7 +85,7 @@ class Macros extends MacroSet
 				$args[1] = substr($args[1], 2);
 			}
 
-			/** @var \DK\ImagesManager\Image $image */
+			/** @var \Carrooi\ImagesManager\Image $image */
 			$image = call_user_func_array(array($imagesManager, 'load'), $args);
 
 			return $image->getUrl($absolute);
