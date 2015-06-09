@@ -1,12 +1,7 @@
 images:
 
 	basePath: %appDir%/../www/images/base
-
 	baseUrl: /images/base
-
-	mask:
-		images: <namespace><separator><namespace>_<name>.<extension>
-		thumbnails: <namespace><separator><namespace>_<name>_<resizeFlag>_<size>.<extension>
 
 	namespaces:
 

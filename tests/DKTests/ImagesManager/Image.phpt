@@ -26,7 +26,7 @@ class ImageTest extends TestCase
 		$manager = $this->getManager();
 		$image = $manager->load('dots', 'black.jpg');
 
-		Assert::same($this->context->parameters['appDir']. '/../www/images/base/dots/dots_black.jpg', $image->getPath());
+		Assert::same($this->context->parameters['appDir']. '/../www/images/base/dots/black.jpg', $image->getPath());
 	}
 
 
@@ -35,7 +35,7 @@ class ImageTest extends TestCase
 		$manager = $this->getManager();
 		$image = $manager->load('dots', 'black.png')->setSize('200x50');
 
-		Assert::same($this->context->parameters['appDir']. '/../www/images/base/dots/dots_black_fit_200x50.png', $image->getPath());
+		Assert::same($this->context->parameters['appDir']. '/../www/images/base/dots/black_fit_200x50.png', $image->getPath());
 	}
 
 
@@ -44,7 +44,7 @@ class ImageTest extends TestCase
 		$manager = $this->getManager();
 		$image = $manager->load('dots', 'black.jpg')->setSize(50)->setResizeFlag('stretch');
 
-		Assert::same($this->context->parameters['appDir']. '/../www/images/base/dots/dots_black_stretch_50.jpg', $image->getPath());
+		Assert::same($this->context->parameters['appDir']. '/../www/images/base/dots/black_stretch_50.jpg', $image->getPath());
 	}
 
 
@@ -80,7 +80,7 @@ class ImageTest extends TestCase
 		$manager = $this->getManager();
 		$image = $manager->load('dots', 'black.jpg');
 
-		Assert::same('/images/base/dots/dots_black.jpg', $image->getUrl());
+		Assert::same('/images/base/dots/black.jpg', $image->getUrl());
 	}
 
 
@@ -89,7 +89,7 @@ class ImageTest extends TestCase
 		$manager = $this->getManager();
 		$image = $manager->load('dots', 'black.jpg');
 
-		Assert::same('http://localhost/images/base/dots/dots_black.jpg', $image->getUrl(true));
+		Assert::same('http://localhost/images/base/dots/black.jpg', $image->getUrl(true));
 	}
 
 
@@ -98,7 +98,7 @@ class ImageTest extends TestCase
 		$manager = $this->getManager();
 		$image = $manager->load('dots', 'black.jpg')->setSize(4);
 
-		Assert::same('/images/base/dots/dots_black_fit_4.jpg', $image->getUrl());
+		Assert::same('/images/base/dots/black_fit_4.jpg', $image->getUrl());
 	}
 
 
@@ -107,7 +107,7 @@ class ImageTest extends TestCase
 		$manager = $this->getManager();
 		$image = $manager->load('dots', 'black.jpg')->setSize(4);
 
-		Assert::same('http://localhost/images/base/dots/dots_black_fit_4.jpg', $image->getUrl(true));
+		Assert::same('http://localhost/images/base/dots/black_fit_4.jpg', $image->getUrl(true));
 	}
 
 

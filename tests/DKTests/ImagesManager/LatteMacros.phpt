@@ -57,7 +57,7 @@ class LatteMacrosTest extends TestCase
 	{
 		$template = $this->renderTemplate('macro.src');
 
-		Assert::same('<img src="/images/base/dots/dots_black.png">', $template);
+		Assert::same('<img src="/images/base/dots/black.png">', $template);
 	}
 
 
@@ -65,7 +65,7 @@ class LatteMacrosTest extends TestCase
 	{
 		$template = $this->renderTemplate('macro.src.absolute');
 
-		Assert::same('<img src="http://localhost/images/base/dots/dots_black.png">', $template);
+		Assert::same('<img src="http://localhost/images/base/dots/black.png">', $template);
 	}
 
 
@@ -73,7 +73,7 @@ class LatteMacrosTest extends TestCase
 	{
 		$template = $this->renderTemplate('macro.src.default');
 
-		Assert::same('<img src="/images/base/dots/dots_default.jpg">', $template);
+		Assert::same('<img src="/images/base/dots/default.jpg">', $template);
 	}
 
 
@@ -89,7 +89,7 @@ class LatteMacrosTest extends TestCase
 	{
 		$template = $this->renderTemplate('macro.src.thumbnail');
 
-		Assert::same('<img src="/images/base/dots/dots_black_stretch_20x55.png">', $template);
+		Assert::same('<img src="/images/base/dots/black_stretch_20x55.png">', $template);
 	}
 
 
@@ -102,7 +102,7 @@ class LatteMacrosTest extends TestCase
 
 		Assert::false($image->isExists());
 
-		Assert::same('<img src="/images/base/dots/dots_black_fit_2x3.png">', $this->renderTemplate('macro.src.thumbnail.create'));
+		Assert::same('<img src="/images/base/dots/black_fit_2x3.png">', $this->renderTemplate('macro.src.thumbnail.create'));
 
 		Assert::true($image->isExists());
 
@@ -114,7 +114,7 @@ class LatteMacrosTest extends TestCase
 	{
 		$template = $this->renderTemplate('macro.image');
 
-		Assert::same('/images/base/dots/dots_black.jpg', $template);
+		Assert::same('/images/base/dots/black.jpg', $template);
 	}
 
 
@@ -138,7 +138,7 @@ class LatteMacrosTest extends TestCase
 	{
 		$template = $this->renderTemplate('macro.isImage.attr');
 
-		Assert::same('<img src="/images/base/dots/dots_black.png">', $template);
+		Assert::same('<img src="/images/base/dots/black.png">', $template);
 	}
 
 

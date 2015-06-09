@@ -132,7 +132,7 @@ class ImagesManagerTest extends TestCase
 		}, $manager->findImages('dots'));
 
 		$expect = array_map(function($name) use ($manager) {
-			return $manager->getBasePath(). DIRECTORY_SEPARATOR. 'dots'. DIRECTORY_SEPARATOR. 'dots_'. $name;
+			return $manager->getBasePath(). DIRECTORY_SEPARATOR. 'dots'. DIRECTORY_SEPARATOR. $name;
 		}, array(
 			'black.jpg',
 			'black.png',
@@ -156,7 +156,7 @@ class ImagesManagerTest extends TestCase
 		}, $manager->findThumbnails($image));
 
 		$expect = array_map(function($name) use ($image) {
-			return $image->getBasePath(). DIRECTORY_SEPARATOR. $image->getNamespace(). DIRECTORY_SEPARATOR. $image->getNamespace(). '_'. $image->getName(false). '_'. $name. '.jpg';
+			return $image->getBasePath(). DIRECTORY_SEPARATOR. $image->getNamespace(). DIRECTORY_SEPARATOR. $image->getName(false). '_'. $name. '.jpg';
 		}, array(
 			'fit_2',
 			'fill_200',
