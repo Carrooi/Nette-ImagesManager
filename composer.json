@@ -3,7 +3,7 @@
 	"type": "library",
 	"description": "Images manager for Nette framework",
 	"keywords": ["nette", "image", "manager", "storage", "source", "loader"],
-	"homepage": "http://github.com/sakren/nette-images-manager",
+	"homepage": "https://github.com/Carrooi/Nette-ImagesManager/issues",
 	"license": "MIT",
 	"authors": [
 		{
@@ -13,7 +13,7 @@
 		}
 	],
 	"support": {
-		"issues": "https://github.com/sakren/nette-images-manager/issues"
+		"issues": "https://github.com/Carrooi/Nette-ImagesManager/issues"
 	},
 	"require": {
 		"nette/di": "~2.2",
