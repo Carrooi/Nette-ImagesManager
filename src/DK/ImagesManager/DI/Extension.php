@@ -60,8 +60,8 @@ class Extension extends CompilerExtension
 			$manager->addSetup('setResizeFlag', array($config['resizeFlag']));
 		}
 
-		if ($config['default']) {
-			$manager->addSetup('setDefault', array($config['default']));
+		if ($config['default'] !== null) {
+			$manager->addSetup('setDefault', array($config['default'] === false ? null : $config['default']));
 		}
 
 		if ($config['quality']) {
@@ -106,7 +106,7 @@ class Extension extends CompilerExtension
 					$definition['default'] = $definition['lists'][$listName];
 				}
 
-				$namespace->addSetup('setDefault', array($definition['default']));
+				$namespace->addSetup('setDefault', array($definition['default'] === false ? null : $definition['default']));
 			}
 
 			if (isset($definition['lists'])) {

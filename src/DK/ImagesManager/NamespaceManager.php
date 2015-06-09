@@ -91,7 +91,7 @@ class NamespaceManager extends Object
 	 */
 	public function getDefault()
 	{
-		return is_string($this->default) ? $this->default : $this->default[array_rand($this->default)];
+		return is_array($this->default) ? $this->default[array_rand($this->default)] : $this->default;
 	}
 
 
