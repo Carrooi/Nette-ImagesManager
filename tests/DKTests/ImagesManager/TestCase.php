@@ -40,11 +40,7 @@ class TestCase extends BaseTestCase
 			$config = new Configurator;
 
 			$config->setTempDirectory(TEMP_DIR);
-
-			$config->addParameters(array(
-				'appDir' => realpath(__DIR__. '/../app'),
-			));
-
+			$config->addParameters(array('appDir' => realpath(__DIR__. '/../app')));
 			$config->addConfig(__DIR__. '/../app/config/config.neon');
 
 			Extension::register($config);
