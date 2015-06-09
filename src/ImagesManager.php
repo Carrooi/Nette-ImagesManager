@@ -410,7 +410,7 @@ class ImagesManager extends Object
 
 		$image = $this->createImage($namespace, $name);
 
-		if (!$image->isExists() && $default !== false) {
+		if (($image === null || !$image->isExists()) && $default !== false) {
 			if ($default === null) {
 				if (($default = $namespaceManager->getNameResolver()->getDefaultName($name)) === null) {
 					$default = $namespaceManager->getDefault();
@@ -422,7 +422,7 @@ class ImagesManager extends Object
 			}
 		}
 
-		if (!$image->isExists()) {
+		if ($image === null || !$image->isExists()) {
 			throw new ImageNotExistsException('Image "'. $namespaceManager->getNameResolver()->translateName($name). '" does not exists.');
 		}
 
@@ -454,6 +454,8 @@ class ImagesManager extends Object
 		if (pathinfo($name, PATHINFO_EXTENSION) === '') {
 			if (($extension = $this->tryFindExtension($namespace, $name)) !== null) {
 				$name .= ".$extension";
+			} else {
+				return null;
 			}
 		}
 
