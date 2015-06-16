@@ -80,10 +80,11 @@ class Extension extends CompilerExtension
 			$manager->addSetup('setCaching', array('@Nette\Caching\IStorage'));
 		}
 
+		$count = 1;
 		foreach ($config['namespaces'] as $name => $definition) {
 			$nameResolver = isset($definition['nameResolver']) ? $definition['nameResolver'] : $config['nameResolver'];
 
-			$namespace = $builder->addDefinition($this->prefix("namespace.$name"))
+			$namespace = $builder->addDefinition($this->prefix("namespace.$count"))
 				->setClass('Carrooi\ImagesManager\NamespaceManager', array($name, new Statement($nameResolver)))
 				->setAutowired(false)
 				->addSetup('setQuality', array(isset($definition['quality']) ? $definition['quality'] : $config['quality']));
@@ -115,7 +116,9 @@ class Extension extends CompilerExtension
 				}
 			}
 
-			$manager->addSetup('addNamespace', array($name, $this->prefix("@namespace.$name")));
+			$manager->addSetup('addNamespace', array($name, $this->prefix("@namespace.$count")));
+
+			$count++;
 		}
 
 		$builder->addDefinition($this->prefix('helpers'))
