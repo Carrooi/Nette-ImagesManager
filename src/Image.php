@@ -307,14 +307,15 @@ class Image extends Object
 
 
 	/**
+	 * @param bool $asUrl
 	 * @return string
 	 */
-	public function getExpandedName()
+	public function getExpandedName($asUrl = false)
 	{
 		if ($this->isThumbnail()) {
-			return Helpers::expandFromImage($this->thumbnailsMask, $this);
+			return Helpers::expandFromImage($this->thumbnailsMask, $this, true, $asUrl);
 		} else {
-			return Helpers::expandFromImage($this->imagesMask, $this);
+			return Helpers::expandFromImage($this->imagesMask, $this, true, $asUrl);
 		}
 	}
 
@@ -352,7 +353,7 @@ class Image extends Object
 	 */
 	public function getUrl($absolute = false)
 	{
-		$url = $this->baseUrl. '/'. $this->getExpandedName();
+		$url = $this->baseUrl. '/'. $this->getExpandedName(true);
 
 		if (!Strings::startsWith($url, '/')) {
 			$url = '/'. $url;
