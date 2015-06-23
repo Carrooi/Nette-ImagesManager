@@ -448,6 +448,9 @@ All methods which returns images, returns `Carrooi\ImagesManager\Image` class.
 
 # Changelog
 
+* 2.0.3
+	+ Using only forward slashes at urls #4
+
 * 2.0.2
 	+ Names of namespaces configured in DI can now contain any character
 
