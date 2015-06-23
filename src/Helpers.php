@@ -122,12 +122,13 @@ class Helpers extends Object
 	 * @param string $extension
 	 * @param string $size
 	 * @param string $resizeFlag
+	 * @param bool $asUrl
 	 * @return string
 	 */
-	public static function expand($s, $namespace, $name, $extension, $size = null, $resizeFlag = null)
+	public static function expand($s, $namespace, $name, $extension, $size = null, $resizeFlag = null, $asUrl = false)
 	{
 		$s = strtr($s, array(
-			'<separator>' => DIRECTORY_SEPARATOR,
+			'<separator>' => $asUrl ? '/' : DIRECTORY_SEPARATOR,
 			'<namespace>' => $namespace,
 			'<name>' => $name,
 			'<extension>' => $extension,
@@ -148,14 +149,15 @@ class Helpers extends Object
 	 * @param string $s
 	 * @param \Carrooi\ImagesManager\Image $image
 	 * @param bool $thumbnailData
+	 * @param bool $asUrl
 	 * @return string
 	 */
-	public static function expandFromImage($s, Image $image, $thumbnailData = true)
+	public static function expandFromImage($s, Image $image, $thumbnailData = true, $asUrl = false)
 	{
 		if ($thumbnailData) {
-			return self::expand($s, $image->getNamespace(), $image->getName(false), $image->getExtension(), $image->getSize(), $image->getResizeFlag());
+			return self::expand($s, $image->getNamespace(), $image->getName(false), $image->getExtension(), $image->getSize(), $image->getResizeFlag(), $asUrl);
 		} else {
-			return self::expand($s, $image->getNamespace(), $image->getName(false), $image->getExtension());
+			return self::expand($s, $image->getNamespace(), $image->getName(false), $image->getExtension(), null, null, $asUrl);
 		}
 
 	}
