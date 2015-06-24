@@ -2,8 +2,6 @@
 
 namespace Carrooi\ImagesManager;
 
-use Nette\Caching\Cache;
-use Nette\Caching\IStorage;
 use Nette\Http\Url;
 use Nette\Object;
 use Nette\Utils\Image as NetteImage;
@@ -18,8 +16,6 @@ use Carrooi\ImagesManager\Latte\Helpers as TemplateHelpers;
 class ImagesManager extends Object
 {
 
-
-	const CACHE_NAMESPACE = 'Carrooi.ImagesManager';
 
 	const DEFAULT_IMAGES_MASK = '<namespace><separator><name>.<extension>';
 
@@ -37,12 +33,6 @@ class ImagesManager extends Object
 
 	/** @var \Carrooi\ImagesManager\INameResolver */
 	private $nameResolver;
-
-	/** @var \Nette\Caching\Cache */
-	private $cache;
-
-	/** @var \Nette\Caching\IStorage */
-	private $cacheStorage;
 
 	/** @var string */
 	private $host;
@@ -84,43 +74,6 @@ class ImagesManager extends Object
 		$this->basePath = $basePath;
 		$this->baseUrl = $baseUrl;
 		$this->storage = $storage;
-	}
-
-
-	/**
-	 * @return bool
-	 */
-	public function isCaching()
-	{
-		return $this->cacheStorage !== null;
-	}
-
-
-	/**
-	 * @param \Nette\Caching\IStorage $storage
-	 * @return $this
-	 */
-	public function setCaching(IStorage $storage)
-	{
-		$this->cacheStorage = $storage;
-		return $this;
-	}
-
-
-	/**
-	 * @return \Nette\Caching\Cache
-	 */
-	private function getCache()
-	{
-		if (!$this->isCaching()) {
-			throw new InvalidStateException('Caching is not allowed.');
-		}
-
-		if (!$this->cache) {
-			$this->cache = new Cache($this->cacheStorage, self::CACHE_NAMESPACE);
-		}
-
-		return $this->cache;
 	}
 
 
@@ -507,38 +460,15 @@ class ImagesManager extends Object
 	 */
 	private function tryFindExtension($namespace, $name)
 	{
-		$that = $this;
-		$find = function() use ($that, $namespace, $name) {
-			$path = Helpers::expand($that->getBasePath(). DIRECTORY_SEPARATOR. $that->getImagesMask(), $namespace, $name, '*');
-			$shortName = pathinfo($path, PATHINFO_BASENAME);
-			$dir = pathinfo($path, PATHINFO_DIRNAME);
+		$path = Helpers::expand($this->getBasePath(). DIRECTORY_SEPARATOR. $this->getImagesMask(), $namespace, $name, '*');
+		$shortName = pathinfo($path, PATHINFO_BASENAME);
+		$dir = pathinfo($path, PATHINFO_DIRNAME);
 
-			foreach (Finder::findFiles($shortName)->in($dir) as $image => $file) {		/** @var $file \SplFileInfo */
-				return pathinfo($image, PATHINFO_EXTENSION);
-			}
-
-			return null;
-		};
-
-		if ($this->isCaching()) {
-			$key = "extension/$namespace/$name";
-			$extension = $this->getCache()->load($key);
-
-			if ($extension === null) {
-				$extension = $find();
-				if ($extension === null) {
-					return null;
-				}
-
-				$this->getCache()->save($key, $extension, array(
-					Cache::TAGS => array("$namespace/$name"),
-				));
-			}
-
-			return $extension;
+		foreach (Finder::findFiles($shortName)->in($dir) as $image => $file) {		/** @var $file \SplFileInfo */
+			return pathinfo($image, PATHINFO_EXTENSION);
 		}
 
-		return $find();
+		return null;
 	}
 
 
@@ -577,11 +507,7 @@ class ImagesManager extends Object
 
 		unlink($image->getPath());
 
-		if ($this->isCaching()) {
-			$this->getCache()->clean(array(
-				Cache::TAGS => array("{$image->getNamespace()}/{$image->getName()}"),
-			));
-		}
+		$this->storage->clear($image->getNamespace(), $image->getName());
 	}
 
 

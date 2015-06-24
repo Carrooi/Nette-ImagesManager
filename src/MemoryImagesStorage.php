@@ -21,10 +21,12 @@ class MemoryImagesStorage implements IImagesStorage
 	 */
 	public function getFullName($namespace, $name)
 	{
-		$name = $namespace. '/'. $name;
+		if (!isset($this->names[$namespace])) {
+			$this->names[$namespace] = [];
+		}
 
-		if (isset($this->names[$name])) {
-			return $this->names[$name];
+		if (isset($this->names[$namespace][$name])) {
+			return $this->names[$namespace][$name];
 		}
 
 		return null;
@@ -38,9 +40,35 @@ class MemoryImagesStorage implements IImagesStorage
 	 */
 	public function storeAlias($namespace, $name, $fullName)
 	{
-		$name = $namespace. '/'. $name;
+		if (!isset($this->names[$namespace])) {
+			$this->names[$namespace] = [];
+		}
 
-		$this->names[$name] = $fullName;
+		$this->names[$namespace][$name] = $fullName;
+	}
+
+
+	/**
+	 * @param string $namespace
+	 * @param string $fullName
+	 */
+	public function clear($namespace, $fullName)
+	{
+		if (!isset($this->names[$namespace])) {
+			return;
+		}
+
+		$remove = [];
+
+		foreach ($this->names[$namespace] as $name => $savedFullName) {
+			if ($savedFullName === $fullName) {
+				$remove[] = $name;
+			}
+		}
+
+		foreach ($remove as $name) {
+			unset($this->names[$namespace][$name]);
+		}
 	}
 
 }

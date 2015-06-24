@@ -33,7 +33,6 @@ class Extension extends CompilerExtension
 		'quality' => null,
 		'basePath' => null,
 		'baseUrl' => null,
-		'caching' => true,
 		'mask' => array(
 			'images' => null,
 			'thumbnails' => null,
@@ -76,10 +75,6 @@ class Extension extends CompilerExtension
 
 		if ($config['mask']['thumbnails']) {
 			$manager->addSetup('setThumbnailsMask', array($config['mask']['thumbnails']));
-		}
-
-		if ($config['caching']) {
-			$manager->addSetup('setCaching', array('@Nette\Caching\IStorage'));
 		}
 
 		$count = 1;

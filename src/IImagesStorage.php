@@ -25,4 +25,11 @@ interface IImagesStorage
 	 */
 	public function storeAlias($namespace, $name, $fullName);
 
+
+	/**
+	 * @param string $namespace
+	 * @param string $fullName
+	 */
+	public function clear($namespace, $fullName);
+
 }
