@@ -240,7 +240,7 @@ class ImagesManager extends Object
 			$namespaceManager->setResizeFlag($this->getResizeFlag());
 		}
 
-		if (!$namespaceManager->getDefault()) {
+		if (!$namespaceManager->hasDefault()) {
 			$namespaceManager->setDefault($this->getDefault());
 		}
 
@@ -367,11 +367,18 @@ class ImagesManager extends Object
 		}
 
 		$image = $this->createImage($namespace, $name);
+		$translatedName = $namespaceManager->getNameResolver()->translateName($name);
 
 		if (($image === null || !$image->isExists()) && $default !== false) {
 			if ($default === null) {
 				if (($default = $namespaceManager->getNameResolver()->getDefaultName($name)) === null) {
-					$default = $namespaceManager->getDefault();
+					if (($default = $this->storage->getDefault($namespace, $translatedName)) === null) {
+						$default = $namespaceManager->getDefault();
+
+						if ($default !== null) {
+							$this->storage->storeDefault($namespace, $translatedName, $default);
+						}
+					}
 				}
 			}
 
@@ -381,7 +388,7 @@ class ImagesManager extends Object
 		}
 
 		if ($image === null || !$image->isExists()) {
-			throw new ImageNotExistsException('Image "'. $namespaceManager->getNameResolver()->translateName($name). '" does not exists.');
+			throw new ImageNotExistsException('Image "'. $translatedName. '" does not exists.');
 		}
 
 		if ($resizeFlag !== null) {

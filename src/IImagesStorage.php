@@ -32,4 +32,20 @@ interface IImagesStorage
 	 */
 	public function clear($namespace, $fullName);
 
+
+	/**
+	 * @param string $namespace
+	 * @param string $name
+	 * @return string
+	 */
+	public function getDefault($namespace, $name);
+
+
+	/**
+	 * @param string $namespace
+	 * @param string $name
+	 * @param string $default
+	 */
+	public function storeDefault($namespace, $name, $default);
+
 }

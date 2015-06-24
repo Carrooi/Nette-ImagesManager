@@ -14,6 +14,8 @@ require_once __DIR__. '/../bootstrap.php';
 use Carrooi\ImagesManager\DefaultNameResolver;
 use Carrooi\ImagesManager\ImagesManager;
 use Carrooi\ImagesManager\MemoryImagesStorage;
+use Carrooi\ImagesManager\NamespaceManager;
+use Mockery;
 use Tester\Assert;
 use Nette\Utils\Image as NetteImage;
 use Carrooi\ImagesManager\INameResolver;
@@ -25,6 +27,12 @@ use Carrooi\ImagesManager\Image;
  */
 class ImagesManagerTest extends TestCase
 {
+
+
+	public function tearDown()
+	{
+		Mockery::close();
+	}
 
 
 	public function testLoad()
@@ -48,6 +56,46 @@ class ImagesManagerTest extends TestCase
 		$image = $manager->load('dots', 'pink.jpg');
 
 		Assert::same('default.jpg', $image->getName());
+	}
+
+
+	public function testLoad_default_random()
+	{
+		$storage = new MemoryImagesStorage;
+
+		$resolver = Mockery::mock('Carrooi\ImagesManager\INameResolver')
+			->shouldReceive('translateName')->andReturn('pink.jpg')->getMock()
+			->shouldReceive('getDefaultName')->andReturnNull()->getMock();
+
+		$manager = new ImagesManager($resolver, __DIR__. '/../www/images', '/', $storage);
+
+		$counter = 0;
+		$defaults = [
+			'black.jpg',
+			'white.png',
+		];
+
+		$namespace = Mockery::mock('Carrooi\ImagesManager\NamespaceManager')->makePartial()
+			->shouldReceive('translateName')->andReturn('pink.jpg')->getMock()
+			->shouldReceive('getDefault')->once()->andReturnUsing(function() use ($defaults, &$counter) {
+				return $defaults[$counter++];
+			})->getMock();
+
+		$namespace->setNameResolver($resolver);
+
+		$manager->addNamespace('dots', $namespace);
+
+		Assert::null($storage->getDefault('dots', 'pink.jpg'));
+
+		$image = $manager->load('dots', 'pink.jpg');
+
+		Assert::same('black.jpg', $image->getName());
+		Assert::same('black.jpg', $storage->getDefault('dots', 'pink.jpg'));
+
+		$image = $manager->load('dots', 'pink.jpg');
+
+		Assert::same('black.jpg', $image->getName());
+		Assert::same('black.jpg', $storage->getDefault('dots', 'pink.jpg'));
 	}
 
 

@@ -13,6 +13,9 @@ class MemoryImagesStorage implements IImagesStorage
 	/** @var array */
 	private $names = [];
 
+	/** @var array */
+	private $defaults = [];
+
 
 	/**
 	 * @param string $namespace
@@ -69,6 +72,40 @@ class MemoryImagesStorage implements IImagesStorage
 		foreach ($remove as $name) {
 			unset($this->names[$namespace][$name]);
 		}
+	}
+
+
+	/**
+	 * @param string $namespace
+	 * @param string $name
+	 * @return string
+	 */
+	public function getDefault($namespace, $name)
+	{
+		if (!isset($this->defaults[$namespace])) {
+			$this->defaults[$namespace] = [];
+		}
+
+		if (isset($this->defaults[$namespace][$name])) {
+			return $this->defaults[$namespace][$name];
+		}
+
+		return null;
+	}
+
+
+	/**
+	 * @param string $namespace
+	 * @param string $name
+	 * @param string $default
+	 */
+	public function storeDefault($namespace, $name, $default)
+	{
+		if (!isset($this->defaults[$namespace])) {
+			$this->defaults[$namespace] = [];
+		}
+
+		$this->defaults[$namespace][$name] = $default;
 	}
 
 }

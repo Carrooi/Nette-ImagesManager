@@ -39,7 +39,8 @@ class CachedImagesStorage extends MemoryImagesStorage
 		$name = parent::getFullName($namespace, $name);
 
 		if ($name === null) {
-			$fullName = $this->cache->load($namespace. '/'. $name);
+			$fullName = $this->cache->load('name/'. $namespace. '/'. $name);
+
 			if ($fullName) {
 				parent::storeAlias($namespace, $name, $fullName);
 				return $fullName;
@@ -58,7 +59,7 @@ class CachedImagesStorage extends MemoryImagesStorage
 	{
 		parent::storeAlias($namespace, $name, $fullName);
 
-		$this->cache->save($namespace. '/'. $name, $fullName, array(
+		$this->cache->save('name/'. $namespace. '/'. $name, $fullName, array(
 			Cache::TAGS => array($namespace. '/'. $fullName),
 		));
 	}
@@ -75,6 +76,41 @@ class CachedImagesStorage extends MemoryImagesStorage
 		$this->cache->clean(array(
 			Cache::TAGS => array($namespace. '/'. $fullName),
 		));
+	}
+
+
+	/**
+	 * @param string $namespace
+	 * @param string $name
+	 * @return string
+	 */
+	public function getDefault($namespace, $name)
+	{
+		$default = parent::getDefault($namespace, $name);
+
+		if ($default === null) {
+			$default = $this->cache->load('default/'. $namespace. '/'. $name);
+
+			if ($default) {
+				parent::storeDefault($namespace, $name, $default);
+				return $default;
+			}
+		}
+
+		return null;
+	}
+
+
+	/**
+	 * @param string $namespace
+	 * @param string $name
+	 * @param string $default
+	 */
+	public function storeDefault($namespace, $name, $default)
+	{
+		parent::storeDefault($namespace, $name, $default);
+
+		$this->cache->save('default/'. $namespace. '/'. $name, $default);
 	}
 
 }
