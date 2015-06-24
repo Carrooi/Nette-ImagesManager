@@ -70,10 +70,10 @@ class ImagesManagerTest extends TestCase
 		$manager = new ImagesManager($resolver, __DIR__. '/../www/images', '/', $storage);
 
 		$counter = 0;
-		$defaults = [
+		$defaults = array(
 			'black.jpg',
 			'white.png',
-		];
+		);
 
 		$namespace = Mockery::mock('Carrooi\ImagesManager\NamespaceManager')->makePartial()
 			->shouldReceive('translateName')->andReturn('pink.jpg')->getMock()

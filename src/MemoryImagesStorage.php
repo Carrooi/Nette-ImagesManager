@@ -11,10 +11,10 @@ class MemoryImagesStorage implements IImagesStorage
 
 
 	/** @var array */
-	private $names = [];
+	private $names = array();
 
 	/** @var array */
-	private $defaults = [];
+	private $defaults = array();
 
 
 	/**
@@ -25,7 +25,7 @@ class MemoryImagesStorage implements IImagesStorage
 	public function getFullName($namespace, $name)
 	{
 		if (!isset($this->names[$namespace])) {
-			$this->names[$namespace] = [];
+			$this->names[$namespace] = array();
 		}
 
 		if (isset($this->names[$namespace][$name])) {
@@ -44,7 +44,7 @@ class MemoryImagesStorage implements IImagesStorage
 	public function storeAlias($namespace, $name, $fullName)
 	{
 		if (!isset($this->names[$namespace])) {
-			$this->names[$namespace] = [];
+			$this->names[$namespace] = array();
 		}
 
 		$this->names[$namespace][$name] = $fullName;
@@ -61,7 +61,7 @@ class MemoryImagesStorage implements IImagesStorage
 			return;
 		}
 
-		$remove = [];
+		$remove = array();
 
 		foreach ($this->names[$namespace] as $name => $savedFullName) {
 			if ($savedFullName === $fullName) {
@@ -83,7 +83,7 @@ class MemoryImagesStorage implements IImagesStorage
 	public function getDefault($namespace, $name)
 	{
 		if (!isset($this->defaults[$namespace])) {
-			$this->defaults[$namespace] = [];
+			$this->defaults[$namespace] = array();
 		}
 
 		if (isset($this->defaults[$namespace][$name])) {
@@ -102,7 +102,7 @@ class MemoryImagesStorage implements IImagesStorage
 	public function storeDefault($namespace, $name, $default)
 	{
 		if (!isset($this->defaults[$namespace])) {
-			$this->defaults[$namespace] = [];
+			$this->defaults[$namespace] = array();
 		}
 
 		$this->defaults[$namespace][$name] = $default;
