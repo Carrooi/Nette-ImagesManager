@@ -13,6 +13,7 @@ require_once __DIR__. '/../bootstrap.php';
 
 use Carrooi\ImagesManager\DefaultNameResolver;
 use Carrooi\ImagesManager\ImagesManager;
+use Carrooi\ImagesManager\MemoryImagesStorage;
 use Tester\Assert;
 use Nette\Utils\Image as NetteImage;
 use Carrooi\ImagesManager\INameResolver;
@@ -28,16 +29,22 @@ class ImagesManagerTest extends TestCase
 
 	public function testLoad()
 	{
-		$manager = new ImagesManager(new DefaultNameResolver, __DIR__. '/../www/images', '/');
+		$storage = new MemoryImagesStorage;
+
+		$manager = new ImagesManager(new DefaultNameResolver, __DIR__. '/../www/images', '/', $storage);
+
+		Assert::null($storage->getFullName('dots', 'black.jpg'));
+
 		$image = $manager->load('dots', 'black.jpg');
 
 		Assert::same('black.jpg', $image->getName());
+		Assert::same('black.jpg', $storage->getFullName('dots', 'black.jpg'));
 	}
 
 
 	public function testLoad_default()
 	{
-		$manager = new ImagesManager(new DefaultNameResolver, __DIR__. '/../www/images', '/');
+		$manager = new ImagesManager(new DefaultNameResolver, __DIR__. '/../www/images', '/', new MemoryImagesStorage);
 		$image = $manager->load('dots', 'pink.jpg');
 
 		Assert::same('default.jpg', $image->getName());
@@ -46,7 +53,7 @@ class ImagesManagerTest extends TestCase
 
 	public function testLoad_not_exists()
 	{
-		$manager = new ImagesManager(new DefaultNameResolver, __DIR__. '/../www/images', '/');
+		$manager = new ImagesManager(new DefaultNameResolver, __DIR__. '/../www/images', '/', new MemoryImagesStorage);
 		$manager->setDefault(null);
 
 		Assert::exception(function() use ($manager) {
@@ -57,7 +64,7 @@ class ImagesManagerTest extends TestCase
 
 	public function testLoad_not_exits_and_reset_default()
 	{
-		$manager = new ImagesManager(new DefaultNameResolver, __DIR__. '/../www/images', '/');
+		$manager = new ImagesManager(new DefaultNameResolver, __DIR__. '/../www/images', '/', new MemoryImagesStorage);
 
 		Assert::exception(function() use ($manager) {
 			$manager->load('dots', 'pink.jpg', null, null, false);
@@ -67,16 +74,22 @@ class ImagesManagerTest extends TestCase
 
 	public function testLoad_withoutExtension()
 	{
-		$manager = new ImagesManager(new DefaultNameResolver, __DIR__. '/../www/images', '/');
+		$storage = new MemoryImagesStorage;
+
+		$manager = new ImagesManager(new DefaultNameResolver, __DIR__. '/../www/images', '/', $storage);
+
+		Assert::null($storage->getFullName('dots', 'black'));
+
 		$image = $manager->load('dots', 'black');
 
 		Assert::contains($image->getName(), array('black.jpg', 'black.png'));
+		Assert::contains($storage->getFullName('dots', 'black'), array('black.jpg', 'black.png'));
 	}
 
 
 	public function testLoad_withoutExtension_notExists()
 	{
-		$manager = new ImagesManager(new DefaultNameResolver, __DIR__. '/../www/images', '/');
+		$manager = new ImagesManager(new DefaultNameResolver, __DIR__. '/../www/images', '/', new MemoryImagesStorage);
 		$manager->setDefault(null);
 
 		Assert::exception(function() use ($manager) {
@@ -87,7 +100,7 @@ class ImagesManagerTest extends TestCase
 
 	public function testLoad_customNameResolver()
 	{
-		$manager = new ImagesManager(new ArrayNameResolver, __DIR__. '/../www/images', '/');
+		$manager = new ImagesManager(new ArrayNameResolver, __DIR__. '/../www/images', '/', new MemoryImagesStorage);
 
 		$image = $manager->load('dots', array(
 			'name' => 'black',
@@ -100,7 +113,7 @@ class ImagesManagerTest extends TestCase
 
 	public function testLoad_customNameResolverDefault()
 	{
-		$manager = new ImagesManager(new ArrayNameResolver, __DIR__. '/../www/images', '/');
+		$manager = new ImagesManager(new ArrayNameResolver, __DIR__. '/../www/images', '/', new MemoryImagesStorage);
 
 		$image = $manager->load('dots', array(
 			'name' => 'pink',
@@ -113,7 +126,7 @@ class ImagesManagerTest extends TestCase
 
 	public function testLoad_customNameResolverRewriteDefault()
 	{
-		$manager = new ImagesManager(new ArrayNameResolver('black.jpg'), __DIR__. '/../www/images', '/');
+		$manager = new ImagesManager(new ArrayNameResolver('black.jpg'), __DIR__. '/../www/images', '/', new MemoryImagesStorage);
 
 		$image = $manager->load('dots', array(
 			'name' => 'pink',
@@ -126,7 +139,7 @@ class ImagesManagerTest extends TestCase
 
 	public function testFindImages()
 	{
-		$manager = new ImagesManager(new DefaultNameResolver, __DIR__. '/../www/images', '/');
+		$manager = new ImagesManager(new DefaultNameResolver, __DIR__. '/../www/images', '/', new MemoryImagesStorage);
 
 		$images = array_map(function(Image $image) {
 			return $image->getPath();
@@ -150,7 +163,7 @@ class ImagesManagerTest extends TestCase
 
 	public function testFindThumbnails()
 	{
-		$manager = new ImagesManager(new DefaultNameResolver, __DIR__. '/../www/images', '/');
+		$manager = new ImagesManager(new DefaultNameResolver, __DIR__. '/../www/images', '/', new MemoryImagesStorage);
 
 		$image = new Image('dots', 'black.jpg');
 		$image->setBasePath(__DIR__. '/../www/images');
@@ -178,7 +191,7 @@ class ImagesManagerTest extends TestCase
 	{
 		$this->lock();
 
-		$manager = new ImagesManager(new DefaultNameResolver, __DIR__. '/../www/images', '/');
+		$manager = new ImagesManager(new DefaultNameResolver, __DIR__. '/../www/images', '/', new MemoryImagesStorage);
 
 		$imageSource = new Image('dots', 'newBlack.jpg');
 		$imageSource->setBasePath(__DIR__. '/../www/images');
@@ -198,7 +211,7 @@ class ImagesManagerTest extends TestCase
 	{
 		$this->lock();
 
-		$manager = new ImagesManager(new ArrayNameResolver, __DIR__. '/../www/images', '/');
+		$manager = new ImagesManager(new ArrayNameResolver, __DIR__. '/../www/images', '/', new MemoryImagesStorage);
 
 		$imageSource = new Image('dots', 'newBlack.jpg');
 		$imageSource->setBasePath(__DIR__. '/../www/images');
@@ -221,7 +234,7 @@ class ImagesManagerTest extends TestCase
 	{
 		$this->lock();
 
-		$manager = new ImagesManager(new DefaultNameResolver, __DIR__. '/../www/images', '/');
+		$manager = new ImagesManager(new DefaultNameResolver, __DIR__. '/../www/images', '/', new MemoryImagesStorage);
 
 		copy(__DIR__. '/../www/images/originalBlack.jpg', __DIR__. '/../www/images/dots/newBlack.jpg');
 
@@ -240,7 +253,7 @@ class ImagesManagerTest extends TestCase
 	{
 		$this->lock();
 
-		$manager = new ImagesManager(new DefaultNameResolver, __DIR__. '/../www/images', '/');
+		$manager = new ImagesManager(new DefaultNameResolver, __DIR__. '/../www/images', '/', new MemoryImagesStorage);
 
 		copy(__DIR__. '/../www/images/originalBlack.jpg', __DIR__. '/../www/images/dots/newBlack.jpg');
 

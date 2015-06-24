@@ -32,6 +32,9 @@ class ImagesManager extends Object
 	const DEFAULT_QUALITY = 90;
 
 
+	/** @var \Carrooi\ImagesManager\IImagesStorage */
+	private $storage;
+
 	/** @var \Carrooi\ImagesManager\INameResolver */
 	private $nameResolver;
 
@@ -73,12 +76,14 @@ class ImagesManager extends Object
 	 * @param \Carrooi\ImagesManager\INameResolver $nameResolver
 	 * @param string $basePath
 	 * @param string $baseUrl
+	 * @param \Carrooi\ImagesManager\IImagesStorage $storage
 	 */
-	public function __construct(INameResolver $nameResolver, $basePath, $baseUrl)
+	public function __construct(INameResolver $nameResolver, $basePath, $baseUrl, IImagesStorage $storage)
 	{
 		$this->nameResolver = $nameResolver;
 		$this->basePath = $basePath;
 		$this->baseUrl = $baseUrl;
+		$this->storage = $storage;
 	}
 
 
@@ -445,18 +450,8 @@ class ImagesManager extends Object
 	 */
 	public function createImage($namespace, $name)
 	{
-		if ($name instanceof ParsedName) {
-			$name = $name->getName();
-		} else {
-			$name = $this->getNamespace($namespace)->getNameResolver()->translateName($name);
-		}
-
-		if (pathinfo($name, PATHINFO_EXTENSION) === '') {
-			if (($extension = $this->tryFindExtension($namespace, $name)) !== null) {
-				$name .= ".$extension";
-			} else {
-				return null;
-			}
+		if (($name = $this->getFullName($namespace, $name)) === null) {
+			return null;
 		}
 
 		$image = new Image($namespace, $name);
@@ -469,6 +464,39 @@ class ImagesManager extends Object
 			->setThumbnailsMask($this->getThumbnailsMask());
 
 		return $image;
+	}
+
+
+	/**
+	 * @param string $namespace
+	 * @param string $name
+	 * @return string
+	 */
+	private function getFullName($namespace, $name)
+	{
+		if ($name instanceof ParsedName) {
+			$name = $name->getName();
+		} else {
+			$name = $this->getNamespace($namespace)->getNameResolver()->translateName($name);
+		}
+
+		if (($found = $this->storage->getFullName($namespace, $name)) !== null) {
+			return $found;
+		}
+
+		$original = $name;
+
+		if (pathinfo($name, PATHINFO_EXTENSION) === '') {
+			if (($extension = $this->tryFindExtension($namespace, $name)) !== null) {
+				$name .= ".$extension";
+			} else {
+				return null;
+			}
+		}
+
+		$this->storage->storeAlias($namespace, $original, $name);
+
+		return $name;
 	}
 
 

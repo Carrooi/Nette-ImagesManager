@@ -47,12 +47,14 @@ class Extension extends CompilerExtension
 		$config = $this->getConfig($this->defaults);
 		$builder = $this->getContainerBuilder();
 
+		$builder->addDefinition($this->prefix('storage'))
+			->setClass('Carrooi\ImagesManager\MemoryImagesStorage');
+
 		$manager = $builder->addDefinition($this->prefix('manager'))
 			->setClass('Carrooi\ImagesManager\ImagesManager', array(
 				new Statement($config['nameResolver']),
 				$config['basePath'],
 				$config['baseUrl'],
-				$config['mask']['thumbnails'],
 			))
 			->addSetup('setHostFromUrl', array('@Nette\Http\Request::url'));
 
