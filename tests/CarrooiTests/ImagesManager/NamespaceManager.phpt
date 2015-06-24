@@ -13,6 +13,7 @@ require_once __DIR__. '/../bootstrap.php';
 
 use Carrooi\ImagesManager\DefaultNameResolver;
 use Carrooi\ImagesManager\ImagesManager;
+use Carrooi\ImagesManager\MemoryImagesStorage;
 use Carrooi\ImagesManager\NamespaceManager;
 use Tester\Assert;
 use Carrooi\ImagesManager\Image;
@@ -69,7 +70,7 @@ class NamespaceManagerTest extends TestCase
 
 	public function testGetList()
 	{
-		$manager = new ImagesManager(new DefaultNameResolver, '/var/www/images', '/');
+		$manager = new ImagesManager(new DefaultNameResolver, '/var/www/images', '/', new MemoryImagesStorage);
 
 		$namespace = new NamespaceManager('dots', new DefaultNameResolver);
 		$namespace->registerImagesManager($manager);

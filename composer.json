@@ -27,7 +27,8 @@
 		"nette/tester": "~1.4",
 		"nette/mail": "~2.2",
 		"nette/safe-stream": "~2.2",
-		"tracy/tracy": "~2.2"
+		"tracy/tracy": "~2.2",
+		"mockery/mockery": "~0.9.0"
 	},
 	"autoload": {
 		"psr-4": {

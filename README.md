@@ -448,8 +448,13 @@ All methods which returns images, returns `Carrooi\ImagesManager\Image` class.
 
 # Changelog
 
+* 2.1.0
+	+ Optimized caching
+	+ Refactored loading of default images
+	+ Storing loaded random default image [#3](https://github.com/Carrooi/Nette-ImagesManager/issues/3)
+
 * 2.0.3
-	+ Using only forward slashes at urls #4
+	+ Using only forward slashes at urls [#4](https://github.com/Carrooi/Nette-ImagesManager/issues/4)
 
 * 2.0.2
 	+ Names of namespaces configured in DI can now contain any character

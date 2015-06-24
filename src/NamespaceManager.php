@@ -87,6 +87,15 @@ class NamespaceManager extends Object
 
 
 	/**
+	 * @return bool
+	 */
+	public function hasDefault()
+	{
+		return $this->default !== null;
+	}
+
+
+	/**
 	 * @return string
 	 */
 	public function getDefault()

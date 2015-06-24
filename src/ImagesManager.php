@@ -2,8 +2,6 @@
 
 namespace Carrooi\ImagesManager;
 
-use Nette\Caching\Cache;
-use Nette\Caching\IStorage;
 use Nette\Http\Url;
 use Nette\Object;
 use Nette\Utils\Image as NetteImage;
@@ -19,8 +17,6 @@ class ImagesManager extends Object
 {
 
 
-	const CACHE_NAMESPACE = 'Carrooi.ImagesManager';
-
 	const DEFAULT_IMAGES_MASK = '<namespace><separator><name>.<extension>';
 
 	const DEFAULT_THUMBNAILS_MASK = '<namespace><separator><name>_<resizeFlag>_<size>.<extension>';
@@ -32,14 +28,11 @@ class ImagesManager extends Object
 	const DEFAULT_QUALITY = 90;
 
 
+	/** @var \Carrooi\ImagesManager\IImagesStorage */
+	private $storage;
+
 	/** @var \Carrooi\ImagesManager\INameResolver */
 	private $nameResolver;
-
-	/** @var \Nette\Caching\Cache */
-	private $cache;
-
-	/** @var \Nette\Caching\IStorage */
-	private $cacheStorage;
 
 	/** @var string */
 	private $host;
@@ -73,49 +66,14 @@ class ImagesManager extends Object
 	 * @param \Carrooi\ImagesManager\INameResolver $nameResolver
 	 * @param string $basePath
 	 * @param string $baseUrl
+	 * @param \Carrooi\ImagesManager\IImagesStorage $storage
 	 */
-	public function __construct(INameResolver $nameResolver, $basePath, $baseUrl)
+	public function __construct(INameResolver $nameResolver, $basePath, $baseUrl, IImagesStorage $storage)
 	{
 		$this->nameResolver = $nameResolver;
 		$this->basePath = $basePath;
 		$this->baseUrl = $baseUrl;
-	}
-
-
-	/**
-	 * @return bool
-	 */
-	public function isCaching()
-	{
-		return $this->cacheStorage !== null;
-	}
-
-
-	/**
-	 * @param \Nette\Caching\IStorage $storage
-	 * @return $this
-	 */
-	public function setCaching(IStorage $storage)
-	{
-		$this->cacheStorage = $storage;
-		return $this;
-	}
-
-
-	/**
-	 * @return \Nette\Caching\Cache
-	 */
-	private function getCache()
-	{
-		if (!$this->isCaching()) {
-			throw new InvalidStateException('Caching is not allowed.');
-		}
-
-		if (!$this->cache) {
-			$this->cache = new Cache($this->cacheStorage, self::CACHE_NAMESPACE);
-		}
-
-		return $this->cache;
+		$this->storage = $storage;
 	}
 
 
@@ -282,7 +240,7 @@ class ImagesManager extends Object
 			$namespaceManager->setResizeFlag($this->getResizeFlag());
 		}
 
-		if (!$namespaceManager->getDefault()) {
+		if (!$namespaceManager->hasDefault()) {
 			$namespaceManager->setDefault($this->getDefault());
 		}
 
@@ -409,11 +367,18 @@ class ImagesManager extends Object
 		}
 
 		$image = $this->createImage($namespace, $name);
+		$translatedName = $namespaceManager->getNameResolver()->translateName($name);
 
 		if (($image === null || !$image->isExists()) && $default !== false) {
 			if ($default === null) {
 				if (($default = $namespaceManager->getNameResolver()->getDefaultName($name)) === null) {
-					$default = $namespaceManager->getDefault();
+					if (($default = $this->storage->getDefault($namespace, $translatedName)) === null) {
+						$default = $namespaceManager->getDefault();
+
+						if ($default !== null) {
+							$this->storage->storeDefault($namespace, $translatedName, $default);
+						}
+					}
 				}
 			}
 
@@ -423,7 +388,7 @@ class ImagesManager extends Object
 		}
 
 		if ($image === null || !$image->isExists()) {
-			throw new ImageNotExistsException('Image "'. $namespaceManager->getNameResolver()->translateName($name). '" does not exists.');
+			throw new ImageNotExistsException('Image "'. $translatedName. '" does not exists.');
 		}
 
 		if ($resizeFlag !== null) {
@@ -445,18 +410,8 @@ class ImagesManager extends Object
 	 */
 	public function createImage($namespace, $name)
 	{
-		if ($name instanceof ParsedName) {
-			$name = $name->getName();
-		} else {
-			$name = $this->getNamespace($namespace)->getNameResolver()->translateName($name);
-		}
-
-		if (pathinfo($name, PATHINFO_EXTENSION) === '') {
-			if (($extension = $this->tryFindExtension($namespace, $name)) !== null) {
-				$name .= ".$extension";
-			} else {
-				return null;
-			}
+		if (($name = $this->getFullName($namespace, $name)) === null) {
+			return null;
 		}
 
 		$image = new Image($namespace, $name);
@@ -477,40 +432,50 @@ class ImagesManager extends Object
 	 * @param string $name
 	 * @return string
 	 */
-	private function tryFindExtension($namespace, $name)
+	private function getFullName($namespace, $name)
 	{
-		$that = $this;
-		$find = function() use ($that, $namespace, $name) {
-			$path = Helpers::expand($that->getBasePath(). DIRECTORY_SEPARATOR. $that->getImagesMask(), $namespace, $name, '*');
-			$shortName = pathinfo($path, PATHINFO_BASENAME);
-			$dir = pathinfo($path, PATHINFO_DIRNAME);
-
-			foreach (Finder::findFiles($shortName)->in($dir) as $image => $file) {		/** @var $file \SplFileInfo */
-				return pathinfo($image, PATHINFO_EXTENSION);
-			}
-
-			return null;
-		};
-
-		if ($this->isCaching()) {
-			$key = "extension/$namespace/$name";
-			$extension = $this->getCache()->load($key);
-
-			if ($extension === null) {
-				$extension = $find();
-				if ($extension === null) {
-					return null;
-				}
-
-				$this->getCache()->save($key, $extension, array(
-					Cache::TAGS => array("$namespace/$name"),
-				));
-			}
-
-			return $extension;
+		if ($name instanceof ParsedName) {
+			$name = $name->getName();
+		} else {
+			$name = $this->getNamespace($namespace)->getNameResolver()->translateName($name);
 		}
 
-		return $find();
+		if (($found = $this->storage->getFullName($namespace, $name)) !== null) {
+			return $found;
+		}
+
+		$original = $name;
+
+		if (pathinfo($name, PATHINFO_EXTENSION) === '') {
+			if (($extension = $this->tryFindExtension($namespace, $name)) !== null) {
+				$name .= ".$extension";
+			} else {
+				return null;
+			}
+		}
+
+		$this->storage->storeAlias($namespace, $original, $name);
+
+		return $name;
+	}
+
+
+	/**
+	 * @param string $namespace
+	 * @param string $name
+	 * @return string
+	 */
+	private function tryFindExtension($namespace, $name)
+	{
+		$path = Helpers::expand($this->getBasePath(). DIRECTORY_SEPARATOR. $this->getImagesMask(), $namespace, $name, '*');
+		$shortName = pathinfo($path, PATHINFO_BASENAME);
+		$dir = pathinfo($path, PATHINFO_DIRNAME);
+
+		foreach (Finder::findFiles($shortName)->in($dir) as $image => $file) {		/** @var $file \SplFileInfo */
+			return pathinfo($image, PATHINFO_EXTENSION);
+		}
+
+		return null;
 	}
 
 
@@ -549,11 +514,7 @@ class ImagesManager extends Object
 
 		unlink($image->getPath());
 
-		if ($this->isCaching()) {
-			$this->getCache()->clean(array(
-				Cache::TAGS => array("{$image->getNamespace()}/{$image->getName()}"),
-			));
-		}
+		$this->storage->clear($image->getNamespace(), $image->getName());
 	}
 
 

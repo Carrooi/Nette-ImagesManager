@@ -33,7 +33,6 @@ class Extension extends CompilerExtension
 		'quality' => null,
 		'basePath' => null,
 		'baseUrl' => null,
-		'caching' => true,
 		'mask' => array(
 			'images' => null,
 			'thumbnails' => null,
@@ -47,12 +46,14 @@ class Extension extends CompilerExtension
 		$config = $this->getConfig($this->defaults);
 		$builder = $this->getContainerBuilder();
 
+		$builder->addDefinition($this->prefix('storage'))
+			->setClass('Carrooi\ImagesManager\MemoryImagesStorage');
+
 		$manager = $builder->addDefinition($this->prefix('manager'))
 			->setClass('Carrooi\ImagesManager\ImagesManager', array(
 				new Statement($config['nameResolver']),
 				$config['basePath'],
 				$config['baseUrl'],
-				$config['mask']['thumbnails'],
 			))
 			->addSetup('setHostFromUrl', array('@Nette\Http\Request::url'));
 
@@ -74,10 +75,6 @@ class Extension extends CompilerExtension
 
 		if ($config['mask']['thumbnails']) {
 			$manager->addSetup('setThumbnailsMask', array($config['mask']['thumbnails']));
-		}
-
-		if ($config['caching']) {
-			$manager->addSetup('setCaching', array('@Nette\Caching\IStorage'));
 		}
 
 		$count = 1;
