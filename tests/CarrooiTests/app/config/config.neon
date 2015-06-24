@@ -32,3 +32,6 @@ services:
 
 	nette.httpRequestFactory:
 		class: CarrooiTests\Mocks\HttpRequestFactory
+
+	images.storage:
+		class: Carrooi\ImagesManager\MemoryImagesStorage
