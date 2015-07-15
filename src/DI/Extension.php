@@ -47,7 +47,7 @@ class Extension extends CompilerExtension
 		$builder = $this->getContainerBuilder();
 
 		$builder->addDefinition($this->prefix('storage'))
-			->setClass('Carrooi\ImagesManager\MemoryImagesStorage');
+			->setClass('Carrooi\ImagesManager\CachedImagesStorage');
 
 		$manager = $builder->addDefinition($this->prefix('manager'))
 			->setClass('Carrooi\ImagesManager\ImagesManager', array(
