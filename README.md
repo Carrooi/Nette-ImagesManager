@@ -413,6 +413,10 @@ images:
 
 # Changelog
 
+* 2.1.1
+	+ Fix url macros when using with custom objects
+	+ Use CachedImagesStorage by default (replaces MemoryImagesStorage)
+
 * 2.1.0
 	+ Optimized caching
 	+ Refactored loading of default images
