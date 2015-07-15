@@ -411,42 +411,11 @@ images:
 			default: <list|avatars>
 ```
 
-# Carrooi\ImagesManager\Image
-
-All methods which returns images, returns `Carrooi\ImagesManager\Image` class.
-
-**Methods:**
-
-| Name                 | Arguments           | Description                                                                    |
-| -------------------- | ------------------- | ------------------------------------------------------------------------------ |
-| `getNamespace`       |                     |                                                                                |
-| `getName`            | `$full = true`      | If `$full` is `true`, file's extension will be appended                        |
-| `setName`            | `$name`             | Name in format: `<name>.<extension>`                                           |
-| `getExtension`       |                     | Returns image's file extension                                                 |
-| `getSize`            |                     | Returns int for width or size in format: `<width>x<height>`                    |
-| `setSize`            | `$size`             | `$size` must be integer for just width or string in format: `<width>x<height>` |
-| `getWidth`           |                     |                                                                                |
-| `setWidth`           | `$width`            |                                                                                |
-| `getHeight`          |                     |                                                                                |
-| `setHeight`          | `$height`           |                                                                                |
-| `getResizeFlag`      |                     |                                                                                |
-| `setResizeFlag`      | `$flag`             |                                                                                |
-| `getBasePath`        |                     |                                                                                |
-| `setBasePath`        | `$path`             |                                                                                |
-| `getBaseUrl`         |                     |                                                                                |
-| `setBaseUrl`         | `$url`              |                                                                                |
-| `getImagesMask`      |                     |                                                                                |
-| `setImagesMask`      | `$mask`             |                                                                                |
-| `getThumbnailsMask`  |                     |                                                                                |
-| `setThumbnailsMask`  | `$mask`             |                                                                                |
-| `isThumbnail`        |                     | Returns `true` if size is set                                                  |
-| `getOriginalPath`    |                     | Returns path to original file (from thumbnail image)                           |
-| `getPath`            |                     | Returns file path to image                                                     |
-| `isExists`           |                     | Returns true if image exists in file system                                    |
-| `getUrl`             | `$absolute = false` | Returns url to image                                                           |
-| `tryCreateThumbnail` | `$quality = null`   | Create and save new thumbnail (size must be set)                               |
-
 # Changelog
+
+* 2.1.1
+	+ Fix url macros when using with custom objects
+	+ Use CachedImagesStorage by default (replaces MemoryImagesStorage)
 
 * 2.1.0
 	+ Optimized caching
