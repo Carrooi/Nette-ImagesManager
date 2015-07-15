@@ -80,7 +80,7 @@ class Macros extends MacroSet
 
 		try {
 			$absolute = false;
-			if (strpos($args[1], '//') === 0) {
+			if ((is_string($args[1]) || is_int($args[1])) && strpos($args[1], '//') === 0) {
 				$absolute = true;
 				$args[1] = substr($args[1], 2);
 			}
