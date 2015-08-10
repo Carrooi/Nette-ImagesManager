@@ -28,8 +28,8 @@ class Macros extends MacroSet
 		$me->addMacro('image', array($me, 'macroImage'));
 		$me->addMacro('src', null, null, array($me, 'macroSrc'));
 
-		$me->addMacro('isImage', array($me, 'macroIsImage'), '}');
-		$me->addMacro('isNotImage', array($me, 'macroIsImage'), '}');
+		$me->addMacro('isImage', '$_imageCurrent = $template->getImagesManager()->createImage(%node.args); if ($_imageCurrent && $_imageCurrent->isExists()) {', '}');
+		$me->addMacro('isNotImage', '$_imageCurrent = $template->getImagesManager()->createImage(%node.args); if (!$_imageCurrent || !$_imageCurrent->isExists()) {', '}');
 	}
 
 
@@ -52,20 +52,6 @@ class Macros extends MacroSet
 	public function macroSrc(MacroNode $node, PhpWriter $writer)
 	{
 		return $writer->write("echo ' src=\"'. \\Carrooi\\ImagesManager\\Latte\\Macros::getUrl(\$template->getImagesManager(), %node.args). '\"';");
-	}
-
-
-	/**
-	 * @param \Latte\MacroNode $node
-	 * @param \Latte\PhpWriter $writer
-	 * @return string
-	 */
-	public function macroIsImage(MacroNode $node, PhpWriter $writer)
-	{
-		$not = $node->name === 'isNotImage' ? '!' : '';
-		$code = "if ($not\$template->getImagesManager()->createImage(%node.args)->isExists()) {";
-
-		return $writer->write($code);
 	}
 
 
