@@ -413,6 +413,9 @@ images:
 
 # Changelog
 
+* 2.1.2
+	+ Fix isImage and isNotImage latte macros for missing images
+
 * 2.1.1
 	+ Fix url macros when using with custom objects
 	+ Use CachedImagesStorage by default (replaces MemoryImagesStorage)
