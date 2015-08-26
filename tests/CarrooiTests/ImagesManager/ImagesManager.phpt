@@ -14,7 +14,6 @@ require_once __DIR__. '/../bootstrap.php';
 use Carrooi\ImagesManager\DefaultNameResolver;
 use Carrooi\ImagesManager\ImagesManager;
 use Carrooi\ImagesManager\MemoryImagesStorage;
-use Carrooi\ImagesManager\NamespaceManager;
 use Mockery;
 use Tester\Assert;
 use Nette\Utils\Image as NetteImage;
@@ -252,6 +251,17 @@ class ImagesManagerTest extends TestCase
 		Assert::true($imageSource->isExists());
 
 		unlink($imageSource->getPath());
+	}
+
+
+	public function testUpload_unknownName()
+	{
+		$manager = new ImagesManager(new DefaultNameResolver, __DIR__. '/../www/images', '/', new MemoryImagesStorage);
+		$image = Mockery::mock('Nette\Utils\Image');
+
+		Assert::exception(function() use ($manager, $image) {
+			$manager->upload($image, 'dots', 'violet');
+		}, 'Carrooi\ImagesManager\InvalidImageNameException', 'Could not upload image with unknown name.');
 	}
 
 

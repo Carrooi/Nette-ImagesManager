@@ -488,6 +488,12 @@ class ImagesManager extends Object
 	 */
 	public function upload(NetteImage $image, $namespace, $name, $quality = null)
 	{
+		if (($name = $this->getFullName($namespace, $name)) === null) {
+			throw new InvalidImageNameException('Could not upload image with unknown name.');
+		}
+
+		$name = new ParsedName($name);
+
 		$img = $this->createImage($namespace, $name);
 		if ($img->isExists()) {
 			$this->removeImage($img);
