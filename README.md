@@ -413,6 +413,11 @@ images:
 
 # Changelog
 
+* 2.1.3
+	+ Optimize exceptions
+	+ Throw an exception when uploading image with unknown name (eg. without file extension)
+	+ Remove old image before reuploading even with different extension [#6](https://github.com/Carrooi/Nette-ImagesManager/issues/6)
+
 * 2.1.2
 	+ Fix isImage and isNotImage latte macros for missing images
 
