@@ -430,9 +430,10 @@ class ImagesManager extends Object
 	/**
 	 * @param string $namespace
 	 * @param string $name
+	 * @param bool $tryWithoutExtension
 	 * @return string
 	 */
-	private function getFullName($namespace, $name)
+	private function getFullName($namespace, $name, $tryWithoutExtension = false)
 	{
 		if ($name instanceof ParsedName) {
 			$name = $name->getName();
@@ -444,11 +445,20 @@ class ImagesManager extends Object
 			return $found;
 		}
 
+		if ($tryWithoutExtension) {
+			$originalExtension = pathinfo($name, PATHINFO_EXTENSION);
+			$name = pathinfo($name, PATHINFO_FILENAME);
+		}
+
 		$original = $name;
 
 		if (pathinfo($name, PATHINFO_EXTENSION) === '') {
 			if (($extension = $this->tryFindExtension($namespace, $name)) !== null) {
 				$name .= ".$extension";
+
+			} elseif (isset($originalExtension) && $originalExtension !== '') {
+				$name .= ".$originalExtension";
+
 			} else {
 				return null;
 			}
@@ -488,7 +498,7 @@ class ImagesManager extends Object
 	 */
 	public function upload(NetteImage $image, $namespace, $name, $quality = null)
 	{
-		if (($name = $this->getFullName($namespace, $name)) === null) {
+		if (($name = $this->getFullName($namespace, $name, true)) === null) {
 			throw new InvalidImageNameException('Could not upload image with unknown name.');
 		}
 
