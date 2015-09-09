@@ -13,6 +13,7 @@ require_once __DIR__. '/../bootstrap.php';
 
 use Carrooi\ImagesManager\Image;
 use Tester\Assert;
+use Tester\Environment;
 
 /**
  *
@@ -20,6 +21,16 @@ use Tester\Assert;
  */
 class ImageTest extends TestCase
 {
+
+
+	public function testSetName_uuid()
+	{
+		Environment::$checkAssertions = false;
+
+		$image = new Image('image', 'f49ab0db-7cc7-414c-9082-55930c1016e6.jpg');
+
+		Assert::same('f49ab0db-7cc7-414c-9082-55930c1016e6.jpg', $image->getName());
+	}
 
 
 	public function testGetPath()

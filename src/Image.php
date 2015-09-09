@@ -14,7 +14,7 @@ class Image extends Object
 {
 
 
-	const NAME_REGEX = '[a-zA-Z0-9]+';
+	const NAME_REGEX = '[a-zA-Z0-9-]+';
 
 
 	/** @var string */
