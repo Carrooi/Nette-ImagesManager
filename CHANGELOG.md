@@ -1,5 +1,8 @@
 # Change log
 
+## [2.1.4](https://github.com/Carrooi/Nette-ImagesManager/compare/2.1.3...2.1.4)
+* Allow dash in images names
+
 ## [2.1.3](https://github.com/Carrooi/Nette-ImagesManager/compare/2.1.2...2.1.3)
 * Optimize exceptions
 * Throw an exception when uploading image with unknown name (eg. without file extension)
