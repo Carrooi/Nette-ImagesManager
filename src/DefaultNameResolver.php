@@ -17,7 +17,7 @@ class DefaultNameResolver extends Object implements INameResolver
 	 */
 	public function translateName($name)
 	{
-		return $name;
+		return (string) $name;
 	}
 
 

@@ -1,5 +1,8 @@
 # Change log
 
+## [Unreleased](https://github.com/Carrooi/Nette-ImagesManager/compare/2.1.4...master)
+* Cast all image names to string from DefaultNameResolver
+
 ## [2.1.4](https://github.com/Carrooi/Nette-ImagesManager/compare/2.1.3...2.1.4)
 * Allow dash in images names
 
