@@ -2,469 +2,74 @@
 
 namespace Carrooi\ImagesManager;
 
-use Nette\Http\Url;
-use Nette\Object;
+use Carrooi\ImagesManager\Caching\ICacheStorage;
+use Carrooi\ImagesManager\Helpers\Validators;
+use Carrooi\ImagesManager\Image\IImageFactory;
+use Carrooi\ImagesManager\Image\Image;
+use Carrooi\ImagesManager\Latte\Helpers;
+use Carrooi\ImagesManager\Storages\IStorage;
 use Nette\Utils\Image as NetteImage;
-use Nette\Utils\Strings;
-use Nette\Utils\Finder;
-use Carrooi\ImagesManager\Latte\Helpers as TemplateHelpers;
 
 /**
  *
- * @author David Kudera
+ * @author David Kudera <kudera.d@gmail.com>
  */
-class ImagesManager extends Object
+class ImagesManager
 {
 
 
-	const DEFAULT_IMAGES_MASK = '<namespace><separator><name>.<extension>';
+	/** @var \Carrooi\ImagesManager\Image\IImageFactory */
+	private $imageFactory;
 
-	const DEFAULT_THUMBNAILS_MASK = '<namespace><separator><name>_<resizeFlag>_<size>.<extension>';
-
-	const DEFAULT_RESIZE_FLAG = 'fit';
-
-	const DEFAULT_DEFAULT_IMAGE = 'default.jpg';
-
-	const DEFAULT_QUALITY = 90;
-
-
-	/** @var \Carrooi\ImagesManager\IImagesStorage */
+	/** @var \Carrooi\ImagesManager\Storages\IStorage */
 	private $storage;
 
-	/** @var \Carrooi\ImagesManager\INameResolver */
-	private $nameResolver;
+	/** @var \Carrooi\ImagesManager\Configuration */
+	private $config;
 
-	/** @var string */
-	private $host;
-
-	/** @var string */
-	private $basePath;
-
-	/** @var string */
-	private $baseUrl;
-
-	/** @var string */
-	private $imagesMask = self::DEFAULT_IMAGES_MASK;
-
-	/** @var string */
-	private $thumbnailsMask = self::DEFAULT_THUMBNAILS_MASK;
-
-	/** @var string */
-	private $resizeFlag = self::DEFAULT_RESIZE_FLAG;
-
-	/** @var string */
-	private $default = self::DEFAULT_DEFAULT_IMAGE;
-
-	/** @var int */
-	private $quality = self::DEFAULT_QUALITY;
-
-	/** @var \Carrooi\ImagesManager\NamespaceManager[] */
-	private $namespaces = array();
+	/** @var \Carrooi\ImagesManager\Caching\ICacheStorage */
+	private $cacheStorage;
 
 
 	/**
-	 * @param \Carrooi\ImagesManager\INameResolver $nameResolver
-	 * @param string $basePath
-	 * @param string $baseUrl
-	 * @param \Carrooi\ImagesManager\IImagesStorage $storage
+	 * @param \Carrooi\ImagesManager\Image\IImageFactory $imageFactory
+	 * @param \Carrooi\ImagesManager\Storages\IStorage $storage
+	 * @param \Carrooi\ImagesManager\Configuration $config
+	 * @param \Carrooi\ImagesManager\Caching\ICacheStorage $cacheStorage
 	 */
-	public function __construct(INameResolver $nameResolver, $basePath, $baseUrl, IImagesStorage $storage)
+	public function __construct(IImageFactory $imageFactory, IStorage $storage, Configuration $config, ICacheStorage $cacheStorage)
 	{
-		$this->nameResolver = $nameResolver;
-		$this->basePath = $basePath;
-		$this->baseUrl = $baseUrl;
+		$this->imageFactory = $imageFactory;
 		$this->storage = $storage;
-	}
-
-
-	/**
-	 * @return string
-	 */
-	public function getResizeFlag()
-	{
-		return $this->resizeFlag;
-	}
-
-
-	/**
-	 * @param string $resizeFlag
-	 * @return $this
-	 */
-	public function setResizeFlag($resizeFlag)
-	{
-		$this->resizeFlag = $resizeFlag;
-		return $this;
-	}
-
-
-	/**
-	 * @return string
-	 */
-	public function getDefault()
-	{
-		return $this->default;
-	}
-
-
-	/**
-	 * @param string $default
-	 * @return $this
-	 */
-	public function setDefault($default)
-	{
-		$this->default = $default;
-		return $this;
-	}
-
-
-	/**
-	 * @return int
-	 */
-	public function getQuality()
-	{
-		return $this->quality;
-	}
-
-
-	/**
-	 * @param int $quality
-	 * @return $this
-	 */
-	public function setQuality($quality)
-	{
-		$this->quality = $quality;
-		return $this;
-	}
-
-
-	/**
-	 * @return string
-	 */
-	public function getHost()
-	{
-		return $this->host;
-	}
-
-
-	/**
-	 * @param string $host
-	 * @return $this
-	 */
-	public function setHost($host)
-	{
-		$this->host = $host;
-		return $this;
-	}
-
-
-	/**
-	 * @param \Nette\Http\Url $url
-	 * @return $this
-	 */
-	public function setHostFromUrl(Url $url)
-	{
-		$this->host = $url->getScheme(). '://'. $url->getHost();
-		return $this;
-	}
-
-
-	/**
-	 * @return string
-	 */
-	public function getBasePath()
-	{
-		return $this->basePath;
-	}
-
-
-	/**
-	 * @return string
-	 */
-	public function getBaseUrl()
-	{
-		return $this->baseUrl;
-	}
-
-
-	/**
-	 * @return string
-	 */
-	public function getImagesMask()
-	{
-		return $this->imagesMask;
-	}
-
-
-	/**
-	 * @param string $imagesMask
-	 * @return $this
-	 */
-	public function setImagesMask($imagesMask)
-	{
-		$this->imagesMask = $imagesMask;
-		return $this;
-	}
-
-
-	/**
-	 * @return string
-	 */
-	public function getThumbnailsMask()
-	{
-		return $this->thumbnailsMask;
-	}
-
-
-	/**
-	 * @param string $thumbnailsMask
-	 * @return $this
-	 */
-	public function setThumbnailsMask($thumbnailsMask)
-	{
-		$this->thumbnailsMask = $thumbnailsMask;
-		return $this;
-	}
-
-
-	/**
-	 * @param string $name
-	 * @param \Carrooi\ImagesManager\NamespaceManager $namespaceManager
-	 * @return \Carrooi\ImagesManager\ImagesManager
-	 */
-	public function addNamespace($name, NamespaceManager $namespaceManager)
-	{
-		$this->namespaces[$name] = $namespaceManager;
-		$namespaceManager->registerImagesManager($this);
-
-		if (!$namespaceManager->getResizeFlag()) {
-			$namespaceManager->setResizeFlag($this->getResizeFlag());
-		}
-
-		if (!$namespaceManager->hasDefault()) {
-			$namespaceManager->setDefault($this->getDefault());
-		}
-
-		if (!$namespaceManager->getQuality()) {
-			$namespaceManager->setQuality($this->getQuality());
-		}
-
-		return $this;
-	}
-
-
-	/**
-	 * @param string $name
-	 * @return \Carrooi\ImagesManager\NamespaceManager
-	 */
-	public function getNamespace($name)
-	{
-		if (!isset($this->namespaces[$name])) {
-			$manager = new NamespaceManager($name, $this->nameResolver);
-			$manager
-				->setDefault($this->getDefault())
-				->setResizeFlag($this->getResizeFlag())
-				->setQuality($this->getQuality());
-
-			$this->addNamespace($name, $manager);
-		}
-
-		return $this->namespaces[$name];
+		$this->config = $config;
+		$this->cacheStorage = $cacheStorage;
 	}
 
 
 	/**
 	 * @param string $namespace
-	 * @return \Carrooi\ImagesManager\Image[]
+	 * @param string $name
+	 * @param bool $needFullName
+	 * @return string
 	 */
-	public function findImages($namespace)
+	private function parseImageName($namespace, $name, $needFullName = false)
 	{
-		$path = $this->basePath. DIRECTORY_SEPARATOR. $this->getImagesMask();
-		$path = strtr($path, array(
-			'<namespace>' => $namespace,
-			'<separator>' => DIRECTORY_SEPARATOR,
-			'<name>' => '*',
-			'<extension>' => '*',
-		));
+		$name = $this->config->getNameResolver($namespace)->getName($name);
 
-		$pos = mb_strrpos($path, DIRECTORY_SEPARATOR);
-		$directory = mb_substr($path, 0, $pos);
-		$finderMask = mb_substr($path, $pos + 1);
+		$needFullName && Validators::validateImageFullName($name);
 
-		$mask = strtr($this->getImagesMask(), array(
-			'<namespace>' => $namespace,
-			'<separator>' => DIRECTORY_SEPARATOR,
-			'<name>' => '%name%',
-			'<extension>' => '%extension%',
-		));
-		$mask = '/'. preg_quote($mask, '/'). '$/';
-		$mask = strtr($mask, array(
-			'%name%' => '(?P<name>'. Image::NAME_REGEX. ')',
-			'%extension%' => '(?P<extension>[a-zA-Z]{3,4})'
-		));
+		if (!Validators::isImageFullName($name)) {
+			if (!$fullName = $this->cacheStorage->getFullName($namespace, $name)) {
 
-		$result = array();
-		foreach (Finder::findFiles($finderMask)->in($directory) as $name => $file) {
-			if ($match = Strings::match($name, $mask)) {
-				$result[] = $this->createImage($namespace, new ParsedName($match['name']. '.'. $match['extension']));
-			}
-		}
-
-		return $result;
-	}
-
-
-	/**
-	 * @param \Carrooi\ImagesManager\Image $image
-	 * @return \Carrooi\ImagesManager\Image[]
-	 */
-	public function findThumbnails(Image $image)
-	{
-		$path = $image->getBasePath(). DIRECTORY_SEPARATOR. $image->getThumbnailsMask();
-
-		$path = Helpers::expandFromImage($path, $image, false);
-
-		$pos = mb_strrpos($path, DIRECTORY_SEPARATOR);
-		$directory = mb_substr($path, 0, $pos);
-		$mask = mb_substr($path, $pos + 1);
-
-		$finderMask = Strings::replace($mask, '/(\<[a-zA-Z]+\>)/', '*');
-
-		$result = array();
-		foreach (Finder::findFiles($finderMask)->in($directory) as $name => $file) {
-			$info = Helpers::parseFileName($name, $mask);
-
-			if ($info) {
-				$result[] = $this->createImage($image->getNamespace(), new ParsedName($image->getName()))
-					->setSize($info->size)
-					->setResizeFlag($info->resizeFlag);
-			}
-		}
-
-		return $result;
-	}
-
-
-	/**
-	 * @param string $namespace
-	 * @param mixed $name
-	 * @param string|int $size
-	 * @param string $resizeFlag
-	 * @param string $default
-	 * @param int $quality
-	 * @return \Carrooi\ImagesManager\Image
-	 * @throws \Carrooi\ImagesManager\ImageNotExistsException
-	 */
-	public function load($namespace, $name, $size = null, $resizeFlag = null, $default = null, $quality = null)
-	{
-		$namespaceManager = $this->getNamespace($namespace);
-
-		if ($resizeFlag === null) {
-			$resizeFlag = $namespaceManager->getResizeFlag();
-		}
-
-		if ($quality === null) {
-			$quality = $namespaceManager->getQuality();
-		}
-
-		$image = $this->createImage($namespace, $name);
-		$translatedName = $namespaceManager->getNameResolver()->translateName($name);
-
-		if (($image === null || !$image->isExists()) && $default !== false) {
-			if ($default === null) {
-				if (($default = $namespaceManager->getNameResolver()->getDefaultName($name)) === null) {
-					if (($default = $this->storage->getDefault($namespace, $translatedName)) === null) {
-						$default = $namespaceManager->getDefault();
-
-						if ($default !== null) {
-							$this->storage->storeDefault($namespace, $translatedName, $default);
-						}
-					}
+				if (!$fullName = $this->storage->getFullName($namespace, $name)) {
+					Validators::validateImageFullName($name);
 				}
+
+				$this->cacheStorage->storeAlias($namespace, $fullName, $name);
 			}
 
-			if ($default !== null) {
-				$image = $this->createImage($namespace, new ParsedName($default));
-			}
+			$name = $fullName;
 		}
-
-		if ($image === null || !$image->isExists()) {
-			throw new ImageNotExistsException('Image "'. $translatedName. '" does not exists.');
-		}
-
-		if ($resizeFlag !== null) {
-			$image->setResizeFlag($resizeFlag);
-		}
-
-		if ($size !== null) {
-			$image->setSize($size)->tryCreateThumbnail($quality);
-		}
-
-		return $image;
-	}
-
-
-	/**
-	 * @param string $namespace
-	 * @param mixed $name
-	 * @return \Carrooi\ImagesManager\Image
-	 */
-	public function createImage($namespace, $name)
-	{
-		if (($name = $this->getFullName($namespace, $name)) === null) {
-			return null;
-		}
-
-		$image = new Image($namespace, $name);
-
-		$image
-			->setHost($this->host)
-			->setBasePath($this->getBasePath())
-			->setBaseUrl($this->getBaseUrl())
-			->setImagesMask($this->getImagesMask())
-			->setThumbnailsMask($this->getThumbnailsMask());
-
-		return $image;
-	}
-
-
-	/**
-	 * @param string $namespace
-	 * @param string $name
-	 * @param bool $tryWithoutExtension
-	 * @return string
-	 */
-	private function getFullName($namespace, $name, $tryWithoutExtension = false)
-	{
-		if ($name instanceof ParsedName) {
-			$name = $name->getName();
-		} else {
-			$name = $this->getNamespace($namespace)->getNameResolver()->translateName($name);
-		}
-
-		if (($found = $this->storage->getFullName($namespace, $name)) !== null) {
-			return $found;
-		}
-
-		if ($tryWithoutExtension) {
-			$originalExtension = pathinfo($name, PATHINFO_EXTENSION);
-			$name = pathinfo($name, PATHINFO_FILENAME);
-		}
-
-		$original = $name;
-
-		if (pathinfo($name, PATHINFO_EXTENSION) === '') {
-			if (($extension = $this->tryFindExtension($namespace, $name)) !== null) {
-				$name .= ".$extension";
-
-			} elseif (isset($originalExtension) && $originalExtension !== '') {
-				$name .= ".$originalExtension";
-
-			} else {
-				return null;
-			}
-		}
-
-		$this->storage->storeAlias($namespace, $original, $name);
 
 		return $name;
 	}
@@ -473,85 +78,190 @@ class ImagesManager extends Object
 	/**
 	 * @param string $namespace
 	 * @param string $name
-	 * @return string
+	 * @return string|null
 	 */
-	private function tryFindExtension($namespace, $name)
+	private function getDefaultImage($namespace, $name)
 	{
-		$path = Helpers::expand($this->getBasePath(). DIRECTORY_SEPARATOR. $this->getImagesMask(), $namespace, $name, '*');
-		$shortName = pathinfo($path, PATHINFO_BASENAME);
-		$dir = pathinfo($path, PATHINFO_DIRNAME);
+		$default = $this->config->getNameResolver($namespace)->getDefaultName($name);
 
-		foreach (Finder::findFiles($shortName)->in($dir) as $image => $file) {		/** @var $file \SplFileInfo */
-			return pathinfo($image, PATHINFO_EXTENSION);
+		if (!$default) {
+			$default = $this->config->getDefaultImage($namespace);
 		}
 
-		return null;
+		return $default ? $default : null;
 	}
 
 
 	/**
 	 * @param \Nette\Utils\Image $image
 	 * @param string $namespace
-	 * @param mixed $name
-	 * @param int $quality
-	 * @return \Carrooi\ImagesManager\Image
+	 * @param string $name
+	 * @return \Carrooi\ImagesManager\Image\Image
 	 */
-	public function upload(NetteImage $image, $namespace, $name, $quality = null)
+	public function upload(NetteImage $image, $namespace, $name)
 	{
-		if (($name = $this->getFullName($namespace, $name, true)) === null) {
-			throw new InvalidImageNameException('Could not upload image with unknown name.');
-		}
+		$name = $this->parseImageName($namespace, $name, true);
 
-		$name = new ParsedName($name);
+		try {
+			$oldName = $this->parseImageName($namespace, pathinfo($name, PATHINFO_FILENAME));
+			$oldImage = $this->imageFactory->create($namespace, $oldName);
 
-		$img = $this->createImage($namespace, $name);
-		if ($img->isExists()) {
-			$this->removeImage($img);
-		}
+			if ($this->storage->isImageExists($oldImage)) {
+				$this->cacheStorage->clear($namespace, $oldName);
+				$this->remove($oldImage);
+			}
+		} catch (InvalidImageNameException $e) {}
 
-		if ($quality === null) {
-			$quality = $this->getNamespace($namespace)->getQuality();
-		}
+		$img = $this->imageFactory->create($namespace, $name);
 
-		$image->save($img->getPath(), $quality);
+		$this->storage->saveImage($image, $img, $this->config->getQuality($namespace));
 
 		return $img;
 	}
 
 
 	/**
-	 * @param \Carrooi\ImagesManager\Image $image
+	 * @param string $namespace
+	 * @param string $name
+	 * @return \Carrooi\ImagesManager\Image\Image
 	 */
-	public function removeImage(Image $image)
+	public function getImage($namespace, $name)
 	{
-		if (!$image->isThumbnail()) {
-			$this->removeThumbnails($image);
+		try {
+			$fullName = $this->parseImageName($namespace, $name);
+		} catch (InvalidImageNameException $e) {
+			if (is_scalar($name) || is_object($name) && method_exists($name, '__toString')) {
+				$name = " $name";
+			} else {
+				$name = '';
+			}
+
+			throw new ImageNotExistsException('Image'. $name. ' does not exists in namespace '. $namespace. '.');
 		}
 
-		unlink($image->getPath());
+		$name = $fullName;
 
-		$this->storage->clear($image->getNamespace(), $image->getName());
+		$image = $this->imageFactory->create($namespace, $name);
+
+		if (!$this->storage->isImageExists($image)) {
+			throw new ImageNotExistsException('Image '. $name. ' does not exists in namespace '. $namespace. '.');
+		}
+
+		return $image;
 	}
 
 
 	/**
-	 * @param \Carrooi\ImagesManager\Image $image
+	 * @param string $namespace
+	 * @param string $name
+	 * @return \Carrooi\ImagesManager\Image\Image|null
 	 */
-	public function removeThumbnails(Image $image)
+	public function findImage($namespace, $name)
 	{
-		foreach ($this->findThumbnails($image) as $thumbnail) {
-			unlink($thumbnail->getPath());
+		try {
+			$image = $this->getImage($namespace, $name);
+		} catch (ImageNotExistsException $e) {
+			$default = $this->getDefaultImage($namespace, $name);
+
+			try {
+				$image = $this->getImage($namespace, $default);
+			} catch (ImageNotExistsException $e) {
+				$image = null;
+			}
 		}
+
+		return isset($image) ? $image : null;
 	}
 
 
 	/**
-	 * @internal
+	 * @param \Carrooi\ImagesManager\Image\Image $image
+	 */
+	public function remove(Image $image)
+	{
+		$this->storage->removeImage($image);
+	}
+
+
+	/**
+	 * @param \Carrooi\ImagesManager\Image\Image $image
+	 * @param int|null $width
+	 * @param int|null $height
+	 * @param int|null $resizeFlag
+	 * @return string
+	 */
+	public function getUrl(Image $image, $width = null, $height = null, $resizeFlag = null)
+	{
+		$resizeFlag = $resizeFlag === null ? $this->config->getResizeFlag($image->getNamespace()) : $resizeFlag;
+
+		return $this->storage->getImageUrl($image, $width, $height, $resizeFlag);
+	}
+
+
+	/**
+	 * @param string $namespace
+	 * @param int|null $width
+	 * @param int|null $height
+	 * @return string|null
+	 */
+	public function getDummyImageUrl($namespace, $width = null, $height = null)
+	{
+		if (!$this->config->isDummyEnabled($namespace)) {
+			return null;
+		}
+
+		if (rand(0, 99) > $this->config->getDummyDisplayChance($namespace)) {
+			return null;
+		}
+
+		if ($width === null || $height === null) {
+			if (!$fallbackSize = $this->config->getDummyFallbackSize($namespace)) {
+				return null;
+			}
+
+			$width = $fallbackSize[0];
+			$height = $fallbackSize[1];
+		}
+
+		$category = $this->config->getDummyCategory($namespace);
+		$provider = $this->config->getDummyProvider($namespace);
+
+		return $provider->getUrl($width, $height, $category);
+	}
+
+
+	/**
+	 * @param \Carrooi\ImagesManager\Image\Image $image
+	 * @param int|null $width
+	 * @param int|null $height
+	 * @param int|null $resizeFlag
+	 * @return \Nette\Utils\Image
+	 */
+	public function tryStoreThumbnail(Image $image, $width = null, $height = null, $resizeFlag = null)
+	{
+		$resizeFlag = $resizeFlag === null ? $this->config->getResizeFlag($image->getNamespace()) : $resizeFlag;
+
+		if ($this->storage->isImageExists($image, $width, $height, $resizeFlag)) {
+			return $this->storage->getNetteImage($image, $width, $height, $resizeFlag);
+		}
+
+		$img = $this->storage->getNetteImage($image);
+		$img->resize($width, $height, $resizeFlag);
+
+		$quality = $this->config->getQuality($image->getNamespace());
+
+		$this->storage->tryStoreThumbnail($image, $img, $width, $height, $resizeFlag, $quality);
+
+		return $img;
+	}
+
+
+	/**
 	 * @return \Carrooi\ImagesManager\Latte\Helpers
 	 */
 	public function createTemplateHelpers()
 	{
-		return new TemplateHelpers($this);
+		return new Helpers($this);
 	}
 
 }

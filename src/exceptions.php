@@ -2,10 +2,14 @@
 
 namespace Carrooi\ImagesManager;
 
-class ImageNotExistsException extends \RuntimeException {}
+class RuntimeException extends \RuntimeException {}
 
-class InvalidStateException extends \RuntimeException {}
+class ImageNotExistsException extends RuntimeException {}
 
-class InvalidImageNameException extends \RuntimeException {}
+class InvalidStateException extends RuntimeException {}
+
+class InvalidImageNameException extends RuntimeException {}
 
 class InvalidArgumentException extends \InvalidArgumentException {}
+
+class ConfigurationException extends RuntimeException {}

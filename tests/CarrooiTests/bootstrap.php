@@ -1,14 +1,10 @@
 <?php
 
-if (!@include __DIR__ . '/../../vendor/autoload.php') {
+if (!$loader = @include __DIR__ . '/../../vendor/autoload.php') {
 	echo 'Install Nette Tester using `composer update --dev`';
 	exit(1);
 }
-
-require_once 'ImagesManager/TestCase.php';
-
-require_once 'Mocks/HttpRequestFactory.php';
-require_once 'Mocks/Control.php';
+$loader->addPsr4('CarrooiTests\\', __DIR__);
 
 // configure environment
 Tester\Environment::setup();

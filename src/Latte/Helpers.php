@@ -2,19 +2,17 @@
 
 namespace Carrooi\ImagesManager\Latte;
 
-use Nette\Object;
-use Latte\Engine;
 use Carrooi\ImagesManager\ImagesManager;
 
 /**
  *
- * @author David Kudera
+ * @author David Kudera <kudera.d@gmail.com>
  */
-class Helpers extends Object
+class Helpers
 {
 
 
-	/** @var \Carrooi\ImagesManager\ImagesManager  */
+	/** @var \Carrooi\ImagesManager\ImagesManager */
 	private $imagesManager;
 
 
@@ -24,30 +22,6 @@ class Helpers extends Object
 	public function __construct(ImagesManager $imagesManager)
 	{
 		$this->imagesManager = $imagesManager;
-	}
-
-
-	/**
-	 * @param \Latte\Engine $engine
-	 */
-	public function register(Engine $engine)
-	{
-		$engine->addFilter('getImagesManager', array($this, 'getImagesManager'));
-	}
-
-
-	/**
-	 * @deprecated
-	 * @param string $method
-	 * @return array
-	 */
-	public function loader($method)
-	{
-		if (method_exists($this, $method)) {
-			return array($this, $method);
-		}
-
-		return null;
 	}
 
 

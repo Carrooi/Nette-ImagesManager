@@ -1,3 +1,7 @@
+extensions:
+	images: Carrooi\ImagesManager\DI\ImagesManagerExtension
+
+
 php:
 
 	date.timezone: Europe/Prague
@@ -14,24 +18,14 @@ nette:
 
 
 images:
+	storage:
+		class: CarrooiTests\Mocks\StorageMock
 
-	basePath: %appDir%/../www/images
-	baseUrl: /images
+	dummy:
+		class: CarrooiTests\Mocks\DummyImageProviderMock
 
 
 services:
 
 	cacheStorage:
 		class: Nette\Caching\Storages\MemoryStorage
-
-	# to lazy to create new factory service
-	router:
-		class: Nette\Application\Routers\RouteList
-		setup:
-			- '$service[] = ?'(Nette\Application\Routers\Route('<presenter>/<action>[/<id>]', 'Homepage:default'))
-
-	nette.httpRequestFactory:
-		class: CarrooiTests\Mocks\HttpRequestFactory
-
-	images.storage:
-		class: Carrooi\ImagesManager\MemoryImagesStorage
