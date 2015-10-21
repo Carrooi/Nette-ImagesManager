@@ -138,7 +138,50 @@ class ImagesManagerTest extends TestCase
 
 		/** @var \Mockery\MockInterface|\Carrooi\ImagesManager\Caching\ICacheStorage $cache */
 		$cache = \Mockery::mock(ICacheStorage::class)
-			->shouldReceive('clear')->once()->with('color', 'blue.png')->getMock();
+			->shouldReceive('clear')->once()->with('color', 'blue.png')->getMock()
+			->shouldReceive('clearImageVersion')->once()->with('color', 'blue.png')->getMock();
+
+		$manager = new ImagesManager($factory, $storage, $config, $cache);
+
+		Assert::same($image, $manager->upload($img, 'color', 'blue.gif'));
+	}
+
+
+	public function testUpload_removeOld_sameName()
+	{
+		/** @var \Mockery\MockInterface|\Carrooi\ImagesManager\Image\Image $image */
+		$image = \Mockery::mock(Image::class);
+
+		/** @var \Mockery\MockInterface|\Carrooi\ImagesManager\Image\Image $image */
+		$oldImage = \Mockery::mock(Image::class);
+
+		/** @var \Mockery\MockInterface|\Nette\Utils\Image $img */
+		$img = \Mockery::mock(NetteImage::class);
+
+		/** @var \Mockery\MockInterface|\Carrooi\ImagesManager\Naming\INameResolver $nameResolver */
+		$nameResolver = \Mockery::mock(INameResolver::class)
+			->shouldReceive('getName')->once()->with('blue')->andReturn('blue.gif')->getMock()
+			->shouldReceive('getName')->once()->with('blue.gif')->andReturn('blue.gif')->getMock();
+
+		/** @var \Mockery\MockInterface|\Carrooi\ImagesManager\Image\IImageFactory $factory */
+		$factory = \Mockery::mock(IImageFactory::class)
+			->shouldReceive('create')->twice()->with('color', 'blue.gif')->andReturnValues([$oldImage, $image])->getMock();
+
+		/** @var \Mockery\MockInterface|\Carrooi\ImagesManager\Storages\IStorage $storage */
+		$storage = \Mockery::mock(IStorage::class)
+			->shouldReceive('isImageExists')->once()->with($oldImage)->andReturn(true)->getMock()
+			->shouldReceive('removeImage')->once()->with($oldImage)->getMock()
+			->shouldReceive('saveImage')->once()->with($img, $image, 80)->getMock();
+
+		/** @var \Mockery\MockInterface|\Carrooi\ImagesManager\Configuration $config */
+		$config = \Mockery::mock(Configuration::class)
+			->shouldReceive('getNameResolver')->twice()->with('color')->andReturn($nameResolver)->getMock()
+			->shouldReceive('getQuality')->once()->with('color')->andReturn(80)->getMock();
+
+		/** @var \Mockery\MockInterface|\Carrooi\ImagesManager\Caching\ICacheStorage $cache */
+		$cache = \Mockery::mock(ICacheStorage::class)
+			->shouldReceive('clear')->once()->with('color', 'blue.gif')->getMock()
+			->shouldReceive('increaseImageVersion')->once()->with('color', 'blue.gif')->getMock();
 
 		$manager = new ImagesManager($factory, $storage, $config, $cache);
 
@@ -533,7 +576,8 @@ class ImagesManagerTest extends TestCase
 	{
 		/** @var \Mockery\MockInterface|\Carrooi\ImagesManager\Image\Image $image */
 		$image = \Mockery::mock(Image::class)
-			->shouldReceive('getNamespace')->once()->andReturn('color')->getMock();
+			->shouldReceive('getNamespace')->twice()->andReturn('color')->getMock()
+			->shouldReceive('getName')->once()->andReturn('image.png')->getMock();
 
 		/** @var \Mockery\MockInterface|\Carrooi\ImagesManager\Image\IImageFactory $factory */
 		$factory = \Mockery::mock(IImageFactory::class);
@@ -547,11 +591,12 @@ class ImagesManagerTest extends TestCase
 			->shouldReceive('getResizeFlag')->once()->with('color')->andReturn(NetteImage::FIT)->getMock();
 
 		/** @var \Mockery\MockInterface|\Carrooi\ImagesManager\Caching\ICacheStorage $cache */
-		$cache = \Mockery::mock(ICacheStorage::class);
+		$cache = \Mockery::mock(ICacheStorage::class)
+			->shouldReceive('getImageVersion')->once()->with('color', 'image.png')->andReturn(3)->getMock();
 
 		$manager = new ImagesManager($factory, $storage, $config, $cache);
 
-		Assert::same('localhost/image.png', $manager->getUrl($image));
+		Assert::same('localhost/image.png?v=3', $manager->getUrl($image));
 	}
 
 
