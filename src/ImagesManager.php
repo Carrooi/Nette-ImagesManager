@@ -106,6 +106,12 @@ class ImagesManager
 			$oldName = $this->parseImageName($namespace, pathinfo($name, PATHINFO_FILENAME));
 			$oldImage = $this->imageFactory->create($namespace, $oldName);
 
+			if ($oldName === $name) {
+				$this->cacheStorage->increaseImageVersion($namespace, $name);
+			} else {
+				$this->cacheStorage->clearImageVersion($namespace, $oldName);
+			}
+
 			if ($this->storage->isImageExists($oldImage)) {
 				$this->cacheStorage->clear($namespace, $oldName);
 				$this->remove($oldImage);
@@ -193,8 +199,9 @@ class ImagesManager
 	public function getUrl(Image $image, $width = null, $height = null, $resizeFlag = null)
 	{
 		$resizeFlag = $resizeFlag === null ? $this->config->getResizeFlag($image->getNamespace()) : $resizeFlag;
+		$version = $this->cacheStorage->getImageVersion($image->getNamespace(), $image->getName());
 
-		return $this->storage->getImageUrl($image, $width, $height, $resizeFlag);
+		return $this->storage->getImageUrl($image, $width, $height, $resizeFlag). '?v='. $version;
 	}
 
 

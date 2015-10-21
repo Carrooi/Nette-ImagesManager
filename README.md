@@ -109,6 +109,9 @@ thumbnails as well.
 
 This step also couldn't be easier, because there are some Latte macros prepared for you.
 
+The nice thing about this package is that you don't need to worry about browsers cache. Increasing version number is 
+automatically appended to all URLs, so browser will always try to load new images when you change it.
+
 **original image:**
 ```html
 <img n:src="users, 'david.jpg'">

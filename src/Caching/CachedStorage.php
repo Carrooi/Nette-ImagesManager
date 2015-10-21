@@ -64,4 +64,39 @@ class CachedStorage implements ICacheStorage
 		]);
 	}
 
+
+	/**
+	 * @param string $namespace
+	 * @param string $name
+	 * @return int
+	 */
+	public function getImageVersion($namespace, $name)
+	{
+		return $this->cache->load('version/'. $namespace. '/'. $name, function() {
+			return 1;
+		});
+	}
+
+
+	/**
+	 * @param string $namespace
+	 * @param string $name
+	 */
+	public function clearImageVersion($namespace, $name)
+	{
+		$this->cache->remove('version/'. $namespace. '/'. $name);
+	}
+
+
+	/**
+	 * @param string $namespace
+	 * @param string $name
+	 */
+	public function increaseImageVersion($namespace, $name)
+	{
+		$version = $this->cache->load('version/'. $namespace. '/'. $name);
+		$version = $version === null ? 0 : $version;
+
+		$this->cache->save('version/'. $namespace. '/'. $name, $version + 1);
+	}
 }

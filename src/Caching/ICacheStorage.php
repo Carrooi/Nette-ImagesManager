@@ -32,4 +32,26 @@ interface ICacheStorage
 	 */
 	public function clear($namespace, $name);
 
+
+	/**
+	 * @param string $namespace
+	 * @param string $name
+	 * @return int
+	 */
+	public function getImageVersion($namespace, $name);
+
+
+	/**
+	 * @param string $namespace
+	 * @param string $name
+	 */
+	public function clearImageVersion($namespace, $name);
+
+
+	/**
+	 * @param string $namespace
+	 * @param string $name
+	 */
+	public function increaseImageVersion($namespace, $name);
+
 }

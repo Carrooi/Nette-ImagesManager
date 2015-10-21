@@ -28,7 +28,7 @@ class MacrosTest extends TestCase
 	{
 		$template = $this->renderTemplate("{image user, '5.jpg', '20x40', fit}");
 
-		Assert::same('http://localhost/user/5_w20_h40_f0.jpg', $template);
+		Assert::same('http://localhost/user/5_w20_h40_f0.jpg?v=1', $template);
 	}
 
 
@@ -66,7 +66,7 @@ class MacrosTest extends TestCase
 	{
 		$template = $this->renderTemplate('<img n:src="user, \'5.jpg\', \'20x40\', fit">');
 
-		Assert::same('<img src="http://localhost/user/5_w20_h40_f0.jpg">', $template);
+		Assert::same('<img src="http://localhost/user/5_w20_h40_f0.jpg?v=1">', $template);
 	}
 
 
