@@ -16,6 +16,7 @@
 		"issues": "https://github.com/Carrooi/Nette-ImagesManager/issues"
 	},
 	"require": {
+		"php": ">= 5.5",
 		"nette/di": "~2.2",
 		"nette/application": "~2.2",
 		"nette/caching": "~2.2",
