@@ -1,5 +1,10 @@
 # Change log
 
+## [3.1.0](https://github.com/Carrooi/Nette-ImagesManager/compare/3.0.0...3.1.0)
+* Add presets for sizes and resize flags
+* Fix tests for some environments
+* Fix readme
+
 ## [3.0.0](https://github.com/Carrooi/Nette-ImagesManager/compare/2.1.4...3.0.0)
 * Complete rewrite (huge BC break)
 * Storing image version and showing it in URLs
