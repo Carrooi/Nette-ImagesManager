@@ -10,7 +10,7 @@ Simple to use tool for managing uploaded images.
 **Be careful, version 3.0 was completely rewritten.**
 
 If you are using just latte templates and uploading images, it should be enough just to move `basePath` and `baseUrl` 
-configuration under the `source` section.
+configuration under the `storage` section.
 
 ## Installation
 
@@ -26,7 +26,7 @@ extensions:
 	images: Carrooi\ImagesManager\DI\ImagesManagerExtension
     
 images:
-	source:
+	storage:
     	basePath: %appDir%/../www/uploads
         baseUrl: http://www.site.com/uploads
 ```
