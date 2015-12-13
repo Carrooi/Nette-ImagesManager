@@ -2,3 +2,5 @@
 
 extension=json.so
 extension=gd.so
+extension=iconv.so
+extension=tokenizer.so
