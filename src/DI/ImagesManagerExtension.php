@@ -14,6 +14,7 @@ use Carrooi\ImagesManager\Naming\DefaultNameResolver;
 use Carrooi\ImagesManager\Storages\FileSystemStorage;
 use Nette\DI\CompilerExtension;
 use Nette\DI\ServiceDefinition;
+use Nette\DI\Statement;
 use Nette\Utils\Strings;
 
 /**
@@ -54,6 +55,7 @@ class ImagesManagerExtension extends CompilerExtension
 		'default' => null,
 		'quality' => null,
 		'dummy' => [],
+		'presets' => [],
 	];
 
 	/** @var array */
@@ -166,6 +168,20 @@ class ImagesManagerExtension extends CompilerExtension
 
 		if ($config['quality'] !== null) {
 			$configuration->addSetup('setQuality', [$namespace, $config['quality']]);
+		}
+
+		if (isset($config['presets']) && count($config['presets'])) {
+			foreach ($config['presets'] as $name => $preset) {
+				if ($preset instanceof Statement) {
+					$size = Helpers::parseSize($preset->getEntity());
+					$resizeFlags = Helpers::parseResizeFlags($preset->arguments);
+				} else {
+					$size = Helpers::parseSize($preset);
+					$resizeFlags = null;
+				}
+
+				$configuration->addSetup('addPreset', [$namespace, $name, $size[0], $size[1], $resizeFlags]);
+			}
 		}
 
 		if ($config['dummy']['enabled'] !== null) {

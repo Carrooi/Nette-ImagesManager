@@ -62,6 +62,46 @@ class MacrosTest extends TestCase
 	}
 
 
+	/*public function testImage_preset_notExists()
+	{
+		Assert::error(function() {
+			$this->renderTemplate("{image user, '5.jpg', small}");
+		}, E_USER_ERROR, 'Preset small does not exists.');
+	}*/
+
+
+	public function testImage_preset()
+	{
+		$config = <<<NEON
+images:
+	namespaces:
+		user:
+			presets:
+				small: 30x40(exact)
+NEON;
+
+		$template = $this->renderTemplate("{image user, '5.jpg', small}", null, $config);
+
+		Assert::same('http://localhost/user/5_w30_h40_f8.jpg?v=1', $template);
+	}
+
+
+	public function testImage_preset_onlyWidth()
+	{
+		$config = <<<NEON
+images:
+	namespaces:
+		user:
+			presets:
+				small: '30'(exact)
+NEON;
+
+		$template = $this->renderTemplate("{image user, '5.jpg', small}", null, $config);
+
+		Assert::same('http://localhost/user/5_w30_f8.jpg?v=1', $template);
+	}
+
+
 	public function testSrc()
 	{
 		$template = $this->renderTemplate('<img n:src="user, \'5.jpg\', \'20x40\', fit">');

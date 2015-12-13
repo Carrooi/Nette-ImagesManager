@@ -56,11 +56,12 @@ class TestCase extends BaseTestCase
 	/**
 	 * @param string $code
 	 * @param callable|null $onContainer
+	 * @param string|null $customConfig
 	 * @return string
 	 */
-	protected function renderTemplate($code, callable $onContainer = null)
+	protected function renderTemplate($code, callable $onContainer = null, $customConfig = null)
 	{
-		$container = $this->createContainer();
+		$container = $this->createContainer($customConfig);
 
 		if ($onContainer) {
 			$onContainer($container);

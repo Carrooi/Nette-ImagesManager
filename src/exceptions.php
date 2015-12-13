@@ -12,4 +12,6 @@ class InvalidImageNameException extends RuntimeException {}
 
 class InvalidArgumentException extends \InvalidArgumentException {}
 
+class PresetNotExistsException extends InvalidArgumentException {}
+
 class ConfigurationException extends RuntimeException {}

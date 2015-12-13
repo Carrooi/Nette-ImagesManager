@@ -173,6 +173,11 @@ images:
 				fallbackSize: [500, 400]
 				chance: 90
 
+			presets:
+				small: 10x20(shrinkOnly, stretch)
+				medium: 50x40(fit)
+				large: 500x400
+
 		book:
 			dummy:
 				enabled: false
@@ -248,6 +253,29 @@ NEON;
 		Assert::same(50, $configuration->getDummyDisplayChance('color'));
 		Assert::same(50, $configuration->getDummyDisplayChance('book'));
 		Assert::same(90, $configuration->getDummyDisplayChance('company-logo'));
+
+		Assert::true($configuration->hasPreset('company-logo', 'small'));
+		Assert::true($configuration->hasPreset('company-logo', 'medium'));
+		Assert::true($configuration->hasPreset('company-logo', 'large'));
+		Assert::false($configuration->hasPreset('company-logo', 'extra-large'));
+
+		Assert::equal([
+			'width' => 10,
+			'height' => 20,
+			'resizeFlag' => NetteImage::SHRINK_ONLY | NetteImage::STRETCH,
+		], $configuration->getPreset('company-logo', 'small'));
+
+		Assert::equal([
+			'width' => 50,
+			'height' => 40,
+			'resizeFlag' => NetteImage::FIT,
+		], $configuration->getPreset('company-logo', 'medium'));
+
+		Assert::equal([
+			'width' => 500,
+			'height' => 400,
+			'resizeFlag' => null,
+		], $configuration->getPreset('company-logo', 'large'));
 	}
 
 }

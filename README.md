@@ -250,3 +250,34 @@ images:
     	user:
         	quality: 100
 ```
+
+## Presets
+
+If you are using specific sizes of images many time, it will be a good idea to create preset from such size. You can 
+save all your images' sizes into configuration under some names and than use these names. 
+
+This is really good when you'll need to change some size in a future, you'll have to change it only in configuration.
+
+**configuration:**
+
+```yaml
+images:
+	namespaces:
+		user:
+			presets:
+				small: 10x20(shrinkOnly, stretch)
+				medium: 40x50(fit)
+				large: 400x500
+```
+
+**template:**
+
+```smarty
+<img n:src="users, 'david.jpg', small">
+```
+
+which is same as:
+
+```smarty
+<img n:src="users, 'david.jpg', 10x20, 'shrinkOnly|stretch'">
+```

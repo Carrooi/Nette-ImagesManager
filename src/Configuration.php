@@ -21,6 +21,7 @@ class Configuration
 	const CONFIG_DEFAULT_IMAGE_NAME = 'default';
 	const CONFIG_RESIZE_FLAG = 'resizeFlag';
 	const CONFIG_QUALITY = 'quality';
+	const CONFIG_PRESETS = 'presets';
 	const CONFIG_NAME_RESOLVER = 'nameResolver';
 	const CONFIG_DUMMY_ENABLED = 'dummyEnabled';
 	const CONFIG_DUMMY_PROVIDER = 'dummyProvider';
@@ -116,6 +117,46 @@ class Configuration
 	public function setNameResolver($namespace, INameResolver $nameResolver)
 	{
 		$this->setConfiguration($namespace, self::CONFIG_NAME_RESOLVER, $nameResolver);
+	}
+
+
+	/**
+	 * @param string $namespace
+	 * @param string $name
+	 * @return bool
+	 */
+	public function hasPreset($namespace, $name)
+	{
+		return isset($this->getConfiguration($namespace, self::CONFIG_PRESETS)[$name]);
+	}
+
+
+	/**
+	 * @param string $namespace
+	 * @param string $name
+	 * @return array|null
+	 */
+	public function getPreset($namespace, $name)
+	{
+		$config = $this->getConfiguration($namespace, self::CONFIG_PRESETS);
+		return isset($config[$name]) ? $config[$name] : null;
+	}
+
+
+	/**
+	 * @param string $namespace
+	 * @param string $name
+	 * @param int $width
+	 * @param int|null $height
+	 * @param int $resizeFlag
+	 */
+	public function addPreset($namespace, $name, $width, $height = null, $resizeFlag)
+	{
+		$this->addConfiguration($namespace, self::CONFIG_PRESETS, [
+			'width' => $width,
+			'height' => $height,
+			'resizeFlag' => $resizeFlag,
+		], $name);
 	}
 
 
@@ -244,7 +285,6 @@ class Configuration
 	 * @param string $namespace
 	 * @param string $type
 	 * @param mixed $value
-	 * @return mixed
 	 */
 	private function setConfiguration($namespace, $type, $value)
 	{
@@ -253,6 +293,30 @@ class Configuration
 		}
 
 		$this->config[$namespace][$type] = $value;
+	}
+
+
+	/**
+	 * @param string $namespace
+	 * @param string $type
+	 * @param mixed $value
+	 * @param string|int|null $key
+	 */
+	private function addConfiguration($namespace, $type, $value, $key = null)
+	{
+		if (!isset($this->config[$namespace])) {
+			$this->createEmptyConfiguration($namespace);
+		}
+
+		if (!is_array($this->config[$namespace][$type])) {
+			throw new InvalidArgumentException('Can not add configuration to non array');
+		}
+
+		if ($key === null) {
+			$this->config[$namespace][$type][] = $value;
+		} else {
+			$this->config[$namespace][$type][$key] = $value;
+		}
 	}
 
 
@@ -270,6 +334,7 @@ class Configuration
 			self::CONFIG_RESIZE_FLAG => $getDefault(self::CONFIG_RESIZE_FLAG, Image::FIT),
 			self::CONFIG_QUALITY => $getDefault(self::CONFIG_QUALITY, null),
 			self::CONFIG_NAME_RESOLVER => $getDefault(self::CONFIG_NAME_RESOLVER, new DefaultNameResolver),
+			self::CONFIG_PRESETS => $getDefault(self::CONFIG_PRESETS, []),
 			self::CONFIG_DUMMY_ENABLED => $getDefault(self::CONFIG_DUMMY_ENABLED, false),
 			self::CONFIG_DUMMY_PROVIDER => $getDefault(self::CONFIG_DUMMY_PROVIDER, new LorempixelDummyImageProvider),
 			self::CONFIG_DUMMY_CATEGORY => $getDefault(self::CONFIG_DUMMY_CATEGORY, null),

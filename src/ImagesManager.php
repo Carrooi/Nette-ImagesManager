@@ -264,6 +264,15 @@ class ImagesManager
 
 
 	/**
+	 * @return \Carrooi\ImagesManager\Configuration
+	 */
+	public function getConfiguration()
+	{
+		return $this->config;
+	}
+
+
+	/**
 	 * @return \Carrooi\ImagesManager\Latte\Helpers
 	 */
 	public function createTemplateHelpers()

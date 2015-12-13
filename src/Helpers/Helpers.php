@@ -15,13 +15,15 @@ class Helpers
 
 
 	/**
-	 * @param string $flags
+	 * @param string|array $flags
 	 * @return int
 	 * @throws \Carrooi\ImagesManager\InvalidArgumentException
 	 */
 	public static function parseResizeFlags($flags)
 	{
-		$flags = explode('|', $flags);
+		if (!is_array($flags)) {
+			$flags = explode('|', $flags);
+		}
 
 		$flags = array_map(function($flag) {
 			switch ($flag) {
@@ -59,7 +61,7 @@ class Helpers
 		$width = null;
 		$height = null;
 
-		if (is_int($size)) {
+		if (is_numeric($size)) {
 			$width = (int) $size;
 			$height = null;
 
