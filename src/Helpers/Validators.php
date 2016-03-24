@@ -18,7 +18,7 @@ class Validators
 	 */
 	public static function isImageFullName($name)
 	{
-		return preg_match('/^[a-zA-Z0-9-_]+\.jpg|jpeg|gif|png$/', $name) ? true : false;
+		return preg_match('/^[a-zA-Z0-9-_]+\.jpg|jpeg|gif|png$/i', $name) ? true : false;
 	}
 
 

@@ -26,7 +26,7 @@ class ValidatorsTest extends TestCase
 
 	public function testIsImageFullName_true()
 	{
-		Assert::true(Validators::isImageFullName('blue.jpg'));
+		Assert::true(Validators::isImageFullName('blue.jPg'));
 	}
 
 
@@ -40,7 +40,7 @@ class ValidatorsTest extends TestCase
 	{
 		Environment::$checkAssertions = false;
 
-		Validators::validateImageFullName('blue.jpg');
+		Validators::validateImageFullName('blue.jpG');
 	}
 
 
