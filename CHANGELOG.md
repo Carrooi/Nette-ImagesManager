@@ -1,5 +1,9 @@
 # Change log
 
+## [3.1.1](https://github.com/Carrooi/Nette-ImagesManager/compare/3.1.0...3.1.1)
+* Fix latte isImage macros: can't be true for default images
+* Fix case sensitivity [#13](https://github.com/Carrooi/Nette-ImagesManager/pull/13)
+
 ## [3.1.0](https://github.com/Carrooi/Nette-ImagesManager/compare/3.0.0...3.1.0)
 * Add presets for sizes and resize flags
 * Fix tests for some environments
