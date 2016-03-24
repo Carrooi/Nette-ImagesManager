@@ -181,6 +181,23 @@ class ImagesManager
 
 
 	/**
+	 * @param string $namespace
+	 * @param string $name
+	 * @return bool
+	 */
+	public function isImageExists($namespace, $name)
+	{
+		try {
+			$this->getImage($namespace, $name);
+		} catch (ImageNotExistsException $e) {
+			return false;
+		}
+
+		return true;
+	}
+
+
+	/**
 	 * @param \Carrooi\ImagesManager\Image\Image $image
 	 */
 	public function remove(Image $image)

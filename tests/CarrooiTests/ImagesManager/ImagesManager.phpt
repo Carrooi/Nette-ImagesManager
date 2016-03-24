@@ -423,6 +423,66 @@ class ImagesManagerTest extends TestCase
 	}
 
 
+	public function testIsImageExists_true()
+	{
+		/** @var \Mockery\MockInterface|\Carrooi\ImagesManager\Image\Image $image */
+		$image = \Mockery::mock(Image::class);
+
+		/** @var \Mockery\MockInterface|\Carrooi\ImagesManager\Naming\INameResolver $nameResolver */
+		$nameResolver = \Mockery::mock(INameResolver::class)
+			->shouldReceive('getName')->once()->with('blue.gif')->andReturn('blue.gif')->getMock();
+
+		/** @var \Mockery\MockInterface|\Carrooi\ImagesManager\Image\IImageFactory $factory */
+		$factory = \Mockery::mock(IImageFactory::class)
+			->shouldReceive('create')->once()->with('color', 'blue.gif')->andReturn($image)->getMock();
+
+		/** @var \Mockery\MockInterface|\Carrooi\ImagesManager\Storages\IStorage $storage */
+		$storage = \Mockery::mock(IStorage::class)
+			->shouldReceive('isImageExists')->once()->with($image)->andReturn(true)->getMock();
+
+		/** @var \Mockery\MockInterface|\Carrooi\ImagesManager\Configuration $config */
+		$config = \Mockery::mock(Configuration::class)
+			->shouldReceive('getNameResolver')->once()->with('color')->andReturn($nameResolver)->getMock();
+
+		/** @var \Mockery\MockInterface|\Carrooi\ImagesManager\Caching\ICacheStorage $cache */
+		$cache = \Mockery::mock(ICacheStorage::class);
+
+		$manager = new ImagesManager($factory, $storage, $config, $cache);
+
+		Assert::true($manager->isImageExists('color', 'blue.gif'));
+	}
+
+
+	public function testIsImageExists_false()
+	{
+		/** @var \Mockery\MockInterface|\Carrooi\ImagesManager\Image\Image $image */
+		$image = \Mockery::mock(Image::class);
+
+		/** @var \Mockery\MockInterface|\Carrooi\ImagesManager\Naming\INameResolver $nameResolver */
+		$nameResolver = \Mockery::mock(INameResolver::class)
+			->shouldReceive('getName')->once()->with('blue.gif')->andReturn('blue.gif')->getMock();
+
+		/** @var \Mockery\MockInterface|\Carrooi\ImagesManager\Image\IImageFactory $factory */
+		$factory = \Mockery::mock(IImageFactory::class)
+			->shouldReceive('create')->once()->with('color', 'blue.gif')->andReturn($image)->getMock();
+
+		/** @var \Mockery\MockInterface|\Carrooi\ImagesManager\Storages\IStorage $storage */
+		$storage = \Mockery::mock(IStorage::class)
+			->shouldReceive('isImageExists')->once()->with($image)->andReturn(false)->getMock();
+
+		/** @var \Mockery\MockInterface|\Carrooi\ImagesManager\Configuration $config */
+		$config = \Mockery::mock(Configuration::class)
+			->shouldReceive('getNameResolver')->once()->with('color')->andReturn($nameResolver)->getMock();
+
+		/** @var \Mockery\MockInterface|\Carrooi\ImagesManager\Caching\ICacheStorage $cache */
+		$cache = \Mockery::mock(ICacheStorage::class);
+
+		$manager = new ImagesManager($factory, $storage, $config, $cache);
+
+		Assert::false($manager->isImageExists('color', 'blue.gif'));
+	}
+
+
 	public function testRemove()
 	{
 		Environment::$checkAssertions = false;

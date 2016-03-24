@@ -26,13 +26,13 @@ class Macros extends MacroSet
 		$me->addMacro('image', [$me, 'macroImage']);
 		$me->addMacro('src', null, null, [$me, 'macroSrc']);
 
-		$isImage = '$template->getImagesManager()->findImage(%node.args)';
+		$isImage = '$template->getImagesManager()->isImageExists(%node.args)';
 
-		$me->addMacro('is-image', 'if ('. $isImage. ' !== null) {', '}');
-		$me->addMacro('isImage', 'if ('. $isImage. ' !== null) {', '}');
+		$me->addMacro('is-image', 'if ('. $isImage. ') {', '}');
+		$me->addMacro('isImage', 'if ('. $isImage. ') {', '}');
 
-		$me->addMacro('is-not-image', 'if ('. $isImage. ' === null) {', '}');
-		$me->addMacro('isNotImage', 'if ('. $isImage. ' === null) {', '}');
+		$me->addMacro('is-not-image', 'if (!'. $isImage. ') {', '}');
+		$me->addMacro('isNotImage', 'if (!'. $isImage. ') {', '}');
 	}
 
 
