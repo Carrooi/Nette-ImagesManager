@@ -26,7 +26,7 @@ class Macros extends MacroSet
 		$me->addMacro('image', [$me, 'macroImage']);
 		$me->addMacro('src', null, null, [$me, 'macroSrc']);
 
-		$isImage = '$template->getImagesManager()->isImageExists(%node.args)';
+		$isImage = 'call_user_func($this->filters->getImagesManager)->isImageExists(%node.args)';
 
 		$me->addMacro('is-image', 'if ('. $isImage. ') {', '}');
 		$me->addMacro('isImage', 'if ('. $isImage. ') {', '}');
@@ -43,7 +43,7 @@ class Macros extends MacroSet
 	 */
 	public function macroImage(MacroNode $node, PhpWriter $writer)
 	{
-		return $writer->write('echo '. get_class($this). '::getUrl($template->getImagesManager(), %node.args);');
+		return $writer->write('echo '. get_class($this). '::getUrl(call_user_func($this->filters->getImagesManager), %node.args);');
 	}
 
 
@@ -54,7 +54,7 @@ class Macros extends MacroSet
 	 */
 	public function macroSrc(MacroNode $node, PhpWriter $writer)
 	{
-		return $writer->write('echo " src=\"". '. get_class($this). '::getUrl($template->getImagesManager(), %node.args). "\"";');
+		return $writer->write('echo " src=\"". '. get_class($this). '::getUrl(call_user_func($this->filters->getImagesManager), %node.args). "\"";');
 	}
 
 

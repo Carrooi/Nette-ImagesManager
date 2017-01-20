@@ -6,16 +6,12 @@ php:
 
 	date.timezone: Europe/Prague
 
+application:
+	mapping:
+		*: CarrooiTests\*Module\Presenters\*Presenter
 
-nette:
-
-	application:
-		mapping:
-			*: CarrooiTests\*Module\Presenters\*Presenter
-
-	session:
-		autoStart: false
-
+session:
+	autoStart: false
 
 images:
 	storage:

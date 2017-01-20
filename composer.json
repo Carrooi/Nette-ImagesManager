@@ -17,18 +17,18 @@
 	},
 	"require": {
 		"php": ">= 5.5",
-		"nette/di": "~2.2",
-		"nette/application": "~2.2",
-		"nette/caching": "~2.2",
-		"nette/robot-loader": "~2.2",
-		"latte/latte": "~2.2"
+		"nette/di": "~2.3",
+		"nette/application": "~2.3",
+		"nette/caching": "~2.3",
+		"nette/robot-loader": "~2.3",
+		"latte/latte": "~2.3"
 	},
 	"require-dev": {
-		"nette/bootstrap": "~2.2",
+		"nette/bootstrap": "~2.3",
 		"nette/tester": "~1.4",
-		"nette/mail": "~2.2",
-		"nette/safe-stream": "~2.2",
-		"tracy/tracy": "~2.2",
+		"nette/mail": "~2.3",
+		"nette/safe-stream": "~2.3",
+		"tracy/tracy": "~2.4",
 		"mockery/mockery": "~0.9.0"
 	},
 	"autoload": {
