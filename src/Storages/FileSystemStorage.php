@@ -4,6 +4,7 @@ namespace Carrooi\ImagesManager\Storages;
 
 use Carrooi\ImagesManager\ConfigurationException;
 use Carrooi\ImagesManager\Image\Image;
+use Nette\Utils\FileSystem;
 use Nette\Utils\Finder;
 use Nette\Utils\Image as NetteImage;
 
@@ -63,6 +64,7 @@ class FileSystemStorage implements IStorage
 	public function saveImage(NetteImage $image, Image $img, $quality = null)
 	{
 		$path = $this->getRealPath($img);
+		FileSystem::createDir(pathinfo($path, PATHINFO_DIRNAME));
 		$image->save($path, $quality);
 	}
 
