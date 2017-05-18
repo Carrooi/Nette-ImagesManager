@@ -377,4 +377,4 @@ class MockStorage implements IStorage
 }
 
 
-run(new ImagesManagerExtensionTest);
+(new ImagesManagerExtensionTest)->run();

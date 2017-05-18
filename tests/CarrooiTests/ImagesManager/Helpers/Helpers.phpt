@@ -66,4 +66,4 @@ class HelpersTest extends TestCase
 }
 
 
-run(new HelpersTest);
+(new HelpersTest)->run();

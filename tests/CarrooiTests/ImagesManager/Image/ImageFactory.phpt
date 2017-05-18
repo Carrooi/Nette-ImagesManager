@@ -37,4 +37,4 @@ class ImageFactoryTest extends TestCase
 }
 
 
-run(new ImageFactoryTest);
+(new ImageFactoryTest)->run();

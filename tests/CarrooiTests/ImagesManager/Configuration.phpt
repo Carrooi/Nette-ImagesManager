@@ -162,4 +162,4 @@ class ConfigurationTest extends TestCase
 }
 
 
-run(new ConfigurationTest);
+(new ConfigurationTest)->run();

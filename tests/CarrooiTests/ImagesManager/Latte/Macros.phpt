@@ -184,4 +184,4 @@ NEON;
 }
 
 
-run(new MacrosTest);
+(new MacrosTest)->run();

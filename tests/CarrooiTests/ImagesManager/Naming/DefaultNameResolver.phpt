@@ -40,4 +40,4 @@ class DefaultNameResolverTest extends TestCase
 }
 
 
-run(new DefaultNameResolverTest);
+(new DefaultNameResolverTest)->run();
