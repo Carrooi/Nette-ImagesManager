@@ -1,5 +1,9 @@
 # Change log
 
+## [4.0.0](https://github.com/Carrooi/Nette-ImagesManager/compare/3.1.1...4.0.0)
+* Try to create base directory automatically
+* Lock on Nette >= 2.4 and PHP >= 5.6
+
 ## [3.1.1](https://github.com/Carrooi/Nette-ImagesManager/compare/3.1.0...3.1.1)
 * Fix latte isImage macros: can't be true for default images
 * Fix case sensitivity [#13](https://github.com/Carrooi/Nette-ImagesManager/pull/13)
