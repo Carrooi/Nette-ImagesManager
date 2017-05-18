@@ -54,4 +54,4 @@ class ValidatorsTest extends TestCase
 }
 
 
-run(new ValidatorsTest);
+(new ValidatorsTest)->run();

@@ -233,4 +233,4 @@ class FileSystemStorageTest extends TestCase
 }
 
 
-run(new FileSystemStorageTest);
+(new FileSystemStorageTest)->run();

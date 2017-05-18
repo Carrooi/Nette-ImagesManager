@@ -697,4 +697,4 @@ class ImagesManagerTest extends TestCase
 }
 
 
-run(new ImagesManagerTest);
+(new ImagesManagerTest)->run();

@@ -40,4 +40,4 @@ class LorempixelDummyImageProviderTest extends TestCase
 }
 
 
-run(new LorempixelDummyImageProviderTest);
+(new LorempixelDummyImageProviderTest)->run();

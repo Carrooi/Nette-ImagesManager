@@ -42,4 +42,4 @@ class ImageTest extends TestCase
 }
 
 
-run(new ImageTest);
+(new ImageTest)->run();
